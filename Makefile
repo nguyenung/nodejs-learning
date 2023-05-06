@@ -1,4 +1,6 @@
 install:
-	npm
+	npm install
 watch:
 	npm run watch
+start:
+	npm start
