@@ -1,0 +1,10 @@
+extends layout/main.pug
+
+block style
+    link(rel="stylesheet", href="/css/form.css")
+
+block content
+    h1 Add product
+    form(action="/admin/add-product" method="POST" class="add-product")
+        input(type="text" name="title")
+        button(type="submit") Add 
