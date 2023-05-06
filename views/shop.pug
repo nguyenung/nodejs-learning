@@ -7,14 +7,15 @@ block content
     h1 Shop
     .product-list
         if products && products.length
-            each product in products
-                .card
-                    img(src='https://www.w3schools.com/w3images/jeans3.jpg' alt='Denim Jeans' style='width:100%')
-                    h1 #{product.title}
-                    p.price $19.99
-                    p Some text about the jeans..
-                    p
-                        button Add to Cart
+            .grid
+                each product in products
+                    .card
+                        img(src='https://www.w3schools.com/w3images/jeans3.jpg' alt='Denim Jeans' style='width:100%')
+                        h1 #{product.title}
+                        p.price $19.99
+                        p Some text about the jeans..
+                        p
+                            button Add to Cart
 
         else
             h2 No product found.

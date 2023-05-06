@@ -2,7 +2,7 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const express = require('express')
 
-//Live reload
+//Live reload when save file
 const livereload = require('livereload')
 const connectLiveReload = require('connect-livereload')
 const liveReloadServer = livereload.createServer();
@@ -39,7 +39,7 @@ const adminRouters = require('./route/admin')
 app.use('/admin', adminRouters.router)
 app.use(shopRouters.router)
 
-// 5. chỉ định 404 page
+// 5. set 404 page
 app.use((req, res, next) => {
     res.status(404).render('404')
 })
