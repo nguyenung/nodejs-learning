@@ -2,42 +2,39 @@ const helpers = require('./../utils/helpers');
 const fs = require('fs');
 const path = require('path');
 
+const productFilePath = path.join(
+    helpers.rootPath(),
+    'data',
+    'products.json'
+)
+
+const getProductsFromFile = (callback) => {
+    fs.readFile(productFilePath, (error, fileContent) => {
+        if (!error) {
+            return callback(JSON.parse(fileContent))
+        } else {
+            return callback([])
+        }
+    })
+}
+
 module.exports = class Product {
     constructor(t) {
         this.title = t
     }
 
     save() {
-        const p = path.join(
-            helpers.rootPath(),
-            'data',
-            'products.json'
-        )
-        fs.readFile(p, (error, fileContent) => {
-            let products = []
-            if (!error) {
-                products = JSON.parse(fileContent)
-            }
+        getProductsFromFile(products => {
             products.push(this)
-            fs.writeFile(p, JSON.stringify(products), (err) => {
-                if(error) {
-                    console.log(error)
+            fs.writeFile(productFilePath, JSON.stringify(products), (err) => {
+                if(err) {
+                    console.log(err)
                 }
             })
         })
     }
 
     static fetchAll(callback) {
-        const p = path.join(
-            helpers.rootPath(),
-            'data',
-            'products.json'
-        )
-        fs.readFile(p, (error, fileContent) => {
-            if (!error) {
-                return callback(JSON.parse(fileContent))
-            }
-            return callback([])
-        })
+        getProductsFromFile(callback)
     }
 }
