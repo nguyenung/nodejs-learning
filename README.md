@@ -3,7 +3,9 @@
 > We learn nothing by being right.
 
 
-Build a awesome web application using Express Framework from scratch
+Build a awesome web application using Express Framework from scratch.
+
+The source code in this project is referenced from the course `NodeJS - The Complete Guide (MVC, REST APIs, GraphQL, Deno)` by Maximilian Schwarzmüller via Udemy.
 
 ## Installation
 
@@ -23,3 +25,5 @@ Instructions on how to use this project.
 	- _Using make:_ `make watch` or `make start`
 
 2. Open `http://localhost:3000` in your browser
+
+## Resouer
