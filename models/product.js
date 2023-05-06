@@ -4,7 +4,7 @@ const path = require('path');
 
 const productFilePath = path.join(
     helpers.rootPath(),
-    'data',
+    '.data',
     'products.json'
 )
 
