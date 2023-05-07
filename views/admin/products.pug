@@ -1,0 +1,22 @@
+extends ../layout/main.pug
+
+block style 
+    link(rel="stylesheet", href="/css/product.css")
+
+block content
+    h1 All product
+    .product-list
+        if products && products.length
+            .grid
+                each product in products
+                    .card
+                        img(src=product.imageUrl alt="Image" style='width:100%')
+                        h1 #{product.title}
+                        p.price $#{product.price}
+                        p #{product.description}
+                        p
+                            a(href="/admin/edit-product/1" class="button button-green") Edit
+                            form(action="/admin/delete-product/1")
+                                button(type="submit" class="button-red") Delete 
+        else
+            h2 No product found.

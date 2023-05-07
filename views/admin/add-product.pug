@@ -1,0 +1,22 @@
+extends ../layout/main.pug
+
+block style
+    link(rel="stylesheet", href="/css/form.css")
+
+block content
+    h1 Add product
+    .form-wrapper
+        form(action="/admin/add-product" method="POST" class="add-product")
+            label(for='product-title') Product title
+            input#product-title(type='text' name='title')
+
+            label(for='product-imageUrl') Product image URL
+            input#product-imageUrl(type='text' name='imageUrl')
+
+            label(for='product-description') Product description
+            input#product-description(type='text' name='description')
+
+            label(for='product-price') Product price
+            input#product-price(type='text' name='price')
+
+            button(type='submit') Add

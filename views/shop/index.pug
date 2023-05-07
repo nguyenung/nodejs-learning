@@ -1,0 +1,22 @@
+extends ../layout/main.pug
+
+block style 
+    link(rel="stylesheet", href="/css/product.css")
+
+block content
+    h1 Shop
+    .product-list
+        if products && products.length
+            .grid
+                each product in products
+                    .card
+                        img(src=product.imageUrl alt="Image" style='width:100%')
+                        h1 #{product.title}
+                        p.price $#{product.price}
+                        p #{product.description}
+                        p
+                            form(action="/add-to-cart/1")
+                                button(type="submit" class="button-green") Add to Cart
+
+        else
+            h2 No product found.

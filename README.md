@@ -2,7 +2,7 @@
 
 > We learn nothing by being right.
 
-Build a awesome web application using Express Framework from scratch.
+Build a awesome online shop web application using Express Framework from scratch.
 
 The source code in this project is referenced from the course `NodeJS - The Complete Guide (MVC, REST APIs, GraphQL, Deno)` by Maximilian Schwarzmüller via Udemy.
 
