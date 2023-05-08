@@ -31,6 +31,7 @@ module.exports = class Product {
     }
 
     save() {
+        this.id = Date.now().toString()
         getProductsFromFile(products => {
             products.push(this)
             fs.writeFile(productFilePath, JSON.stringify(products), (err) => {
