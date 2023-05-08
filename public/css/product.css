@@ -28,6 +28,7 @@
     cursor: pointer;
     border-radius: 4px;
     font-size: 18px;
+    border: 1px solid;
 }
 
 .card button:hover {
@@ -35,7 +36,7 @@
 }
 
 .button-green {background-color: #4CAF50;}
-.button-white {background-color: #fff; color: black;} /* Blue */
+.button-white {background-color: #fff; color: black !important;} /* Blue */
 .button-blue {background-color: #008CBA;} /* Blue */
 .button-red {background-color: #f44336;} /* Red */ 
 .button-gray {background-color: #e7e7e7; color: black;} /* Gray */ 
