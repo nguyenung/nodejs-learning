@@ -15,6 +15,7 @@ block content
                         p.price $#{product.price}
                         p #{product.description}
                         p
+                            a(href=`/products/${product.id}` class="button button-white") Detail
                             form(action="/add-to-cart/1")
                                 button(type="submit" class="button-green") Add to Cart
 

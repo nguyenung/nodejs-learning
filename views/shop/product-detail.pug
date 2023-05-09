@@ -1,4 +1,12 @@
 extends ../layout/main.pug
 
 block content
-    h1 Product detail page
+    if(product)
+        ul
+            li
+                img(src=product.imageUrl, alt=product.title)
+            li  Product name: #{product.title}
+            li  Product price: #{product.price}
+            li  Product description: #{product.description}
+    else
+        h1 Product not found
