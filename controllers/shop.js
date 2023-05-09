@@ -11,8 +11,11 @@ exports.getProducts = (req, res, next) => {
 }
 
 exports.getProduct = (req, res, next) => {
-    console.log(req.params.productId)
-     res.redirect('/')
+    Product.findById(req.params.productId, (product) => {
+        res.render('shop/product-detail', {
+            product: product
+        })
+    })
 }
 
 exports.getIndexPage = (req, res, next) => {
