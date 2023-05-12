@@ -1,0 +1,24 @@
+extends ../layout/main.pug
+
+block style
+    link(rel="stylesheet", href="/css/form.css")
+
+block content
+    h1= (editMode) ? 'Edit product' : 'Add product'
+    .form-wrapper
+        form(action=(editMode ? `/admin/edit-product` : '/admin/add-product'), method="POST", class="add-product")
+            label(for='product-title') Product title
+            input#product-title(type='text' required name='title' value=(editMode ? product.title : ''))
+
+            label(for='product-imageUrl') Product image URL
+            input#product-imageUrl(type='text' required name='imageUrl' value=(editMode ? product.imageUrl : ''))
+
+            label(for='product-description') Product description
+            input#product-description(type='text' name='description' value=(editMode ? product.description : ''))
+
+            label(for='product-price') Product price
+            input#product-price(type='number' step='0.01' required name='price' value=(editMode ? product.price : ''))
+
+            if editMode
+                input(type="hidden", name="productId" value=product.id)
+            button(type='submit')= (editMode) ? 'Update' : 'Add'
