@@ -19,7 +19,7 @@
     font-size: 22px;
 }
 
-.card button, a.button {
+.card button, .button {
     border: none;
     outline: 0;
     padding: 12px;
@@ -31,7 +31,7 @@
     border: 1px solid;
 }
 
-.card button:hover {
+.card button:hover, .button:hover {
     opacity: 0.9;
 }
 
@@ -41,3 +41,14 @@
 .button-red {background-color: #f44336;} /* Red */ 
 .button-gray {background-color: #e7e7e7; color: black;} /* Gray */ 
 .button-black {background-color: #555555;} /* Black */
+
+.product-detail {
+    text-align: center;
+    margin: 0 auto;
+    max-width: 500px;
+}
+
+.product-detail img {
+    width: 100%;
+    margin-top: 30px;;
+}

@@ -1,12 +1,15 @@
 extends ../layout/main.pug
 
+block style
+    link(rel="stylesheet", href="/css/product.css")
+
 block content
     if(product)
-        ul
-            li
-                img(src=product.imageUrl, alt=product.title)
-            li  Product name: #{product.title}
-            li  Product price: #{product.price}
-            li  Product description: #{product.description}
+        .product-detail
+            img(src=product.imageUrl, alt=product.title)
+            h2 #{product.title}
+            h3.price $#{product.price}
+            p #{product.description}
+            include _add-to-cart.pug
     else
         h1 Product not found
