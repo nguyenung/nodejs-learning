@@ -15,7 +15,7 @@ block content
                         p.price $#{product.price}
                         p #{product.description}
                         p
-                            a(href="/admin/edit-product/1" class="button button-green") Edit
+                            a(href=`/admin/edit-product/${product.id}` class="button button-green") Edit
                             form(action="/admin/delete-product/1")
                                 button(type="submit" class="button-red") Delete 
         else
