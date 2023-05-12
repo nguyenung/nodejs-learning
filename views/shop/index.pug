@@ -9,15 +9,7 @@ block content
         if products && products.length
             .grid
                 each product in products
-                    .card
-                        img(src=product.imageUrl alt="Image" style='width:100%')
-                        h1 #{product.title}
-                        p.price $#{product.price}
-                        p #{product.description}
-                        p
-                            a(href=`/products/${product.id}` class="button button-white") Detail
-                            form(action="/add-to-cart/1")
-                                button(type="submit" class="button-green") Add to Cart
+                    include _product-card
 
         else
             h2 No product found.

@@ -1,0 +1,8 @@
+.card
+    img(src=product.imageUrl alt="Image" style='width:100%')
+    h1 #{product.title}
+    p.price $#{product.price}
+    p #{product.description}
+    p
+        a(href=`/products/${product.id}` class="button button-white") Detail
+        include _add-to-cart.pug
