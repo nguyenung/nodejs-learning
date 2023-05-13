@@ -1,6 +1,10 @@
 a {
     text-decoration: none;
 }
+main, nav {
+    max-width: 1000px;
+    margin: 0 auto;
+}
 nav {
     background-color:rgb(227, 241, 102);
     padding: 1px 15px;

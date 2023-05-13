@@ -70,7 +70,6 @@ module.exports = class Cart {
                     const updatedCard = {...cart}
                     const existingProduct = updatedCard.products.find(product => product.id === productId)
 
-                    
                     updatedCard.totalPrice -= existingProduct.quantity * price
                     updatedCard.products = updatedCard.products.filter(
                         product => product.id != productId
