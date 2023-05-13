@@ -1,4 +1,21 @@
 extends ../layout/main.pug
 
+block style 
+    link(rel="stylesheet", href="/css/product.css")
+
 block content
-    h1 Cart page
+    h1 Your cart
+    .product-list
+        if (cartProducts)
+            .grid
+                each cartItem in cartProducts
+                    .card
+                        img(src=`${cartItem.product.imageUrl}` alt="Image" style='width:100%')
+                        h1 #{cartItem.product.title}($#{cartItem.product.price})
+                        p.price Quantity: #{cartItem.quantity}
+                        p
+                            form(action="/delete-cart-item" method="POST")
+                                input(type="hidden", name="productId" value=cartItem.product.id)
+                                button(type="submit" class="button-red") Remove 
+        else
+            p No item
