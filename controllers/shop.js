@@ -32,11 +32,14 @@ exports.getIndexPage = (req, res, next) => {
 exports.getCartPage = (req, res, next) => {
     Cart.fetchCartData(cart => {
         Product.fetchAll(products => {
-            const cartProducts = []
+            let cartData = {
+                products: [],
+                totalPrice: cart.totalPrice
+            }
             for (product of products) {
                 existingProduct = cart.products.find(prod => prod.id === product.id);
                 if (existingProduct) {
-                    cartProducts.push({
+                    cartData.products.push({
                         product: product,
                         quantity: existingProduct.quantity
                     })
@@ -46,7 +49,7 @@ exports.getCartPage = (req, res, next) => {
             res.render('shop/cart', {
                 path: "/cart",
                 pageTitle: "Cart",
-                cartProducts: cartProducts
+                cartData: cartData
             })
         })
     })
@@ -57,6 +60,17 @@ exports.addToCart = (req, res, next) => {
     Product.findById(productId, (product) => {
         Cart.addProduct(productId, product.price)
         res.redirect('/cart')
+    })
+}
+
+exports.deleteCartItem = (req, res, next) => {
+    const productId = req.body.productId
+    Product.findById(productId, product => {
+        if (!product) {
+            return res.redirect('/')
+        }
+        Cart.deleteProduct(product.id, product.price)
+        return res.redirect('/cart')
     })
 }
 
