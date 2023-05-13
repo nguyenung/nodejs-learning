@@ -1,13 +1,25 @@
 const helpers = require('./../utils/helpers');
 const fs = require('fs');
 const path = require('path');
+const Cart = require('./cart');
 
+/**
+ * The absolute file path for the products data file.
+ *
+ * @constant {string}
+ */
 const productFilePath = path.join(
     helpers.rootPath(),
     '.data',
     'products.json'
 )
 
+/**
+ * Read products from a file and invoke a callback with the parsed data.
+ *
+ * @param {function} callback - The callback function to invoke with the parsed data.
+ * @returns {void}
+ */
 const getProductsFromFile = (callback) => {
     fs.readFile(productFilePath, (error, fileContent) => {
         if (!error) {
@@ -31,6 +43,11 @@ module.exports = class Product {
         this.price = price
     }
 
+    /**
+     * Save the product data.
+     *
+     * @returns {void}
+     */
     save() {
         getProductsFromFile(products => {
             if (this.id) {
@@ -56,6 +73,13 @@ module.exports = class Product {
         })
     }
 
+    /**
+     * Find a product by ID.
+     *
+     * @param {string} productId - The ID of the product to find.
+     * @param {function} cb - The callback function to invoke with the found product.
+     * @returns {void}
+     */
     static findById(productId, cb) {
         getProductsFromFile(products => {
             const product = products.find(p => p.id === productId)
@@ -63,7 +87,37 @@ module.exports = class Product {
         })
     }
 
+    /**
+     * Fetch all product from data file.
+     *
+     * @param {function} cb - The callback function to invoke with the found products.
+     * @returns {void}
+     */
     static fetchAll(callback) {
         getProductsFromFile(callback)
+    }
+    
+    /**
+     * Delete a product by ID.
+     *
+     * @param {string} productId - The ID of the product to delete.
+     * @returns {void}
+     */
+    static delete(productId) {
+        getProductsFromFile(products => {
+            const productToDelete = products.find(product => product.id === productId)
+            const updatedProducts = products.filter(
+                product => product.id !== productId
+            )
+
+            fs.writeFile(productFilePath, JSON.stringify(updatedProducts), (err) => {
+                if (err) {
+                    console.log('err write file when delete: ', err)
+                } else {
+                    //Delete in cart
+                    Cart.deleteProduct(productId, productToDelete.price)
+                }
+            })
+        })
     }
 }

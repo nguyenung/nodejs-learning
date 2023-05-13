@@ -62,3 +62,14 @@ exports.doEditProduct = (req, res, next) => {
         res.redirect('/admin/products')
     })
 }
+
+exports.doDeleteProduct = (req, res, next) => {
+    const productId = req.body.productId
+    Product.findById(productId, product => {
+        if (!product) {
+            throw new Error(`Product not found: ${productId}`)
+        }
+        Product.delete(productId)
+        res.redirect('/admin/products')
+    })
+}

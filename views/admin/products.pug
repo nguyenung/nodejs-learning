@@ -16,7 +16,8 @@ block content
                         p #{product.description}
                         p
                             a(href=`/admin/edit-product/${product.id}` class="button button-green") Edit
-                            form(action="/admin/delete-product/1")
+                            form(action="/admin/delete-product" method="POST")
+                                input(type="hidden", name="productId" value=product.id)
                                 button(type="submit" class="button-red") Delete 
         else
             h2 No product found.
