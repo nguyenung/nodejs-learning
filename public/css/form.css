@@ -5,6 +5,7 @@ div.form-wrapper {
 }
 
 form.add-product input[type=text],
+form.add-product input[type=number],
 form.add-product select {
     width: 100%;
     padding: 12px 20px;

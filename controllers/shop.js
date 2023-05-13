@@ -30,9 +30,25 @@ exports.getIndexPage = (req, res, next) => {
 }
 
 exports.getCartPage = (req, res, next) => {
-    res.render('shop/cart', {
-        path: "/cart",
-        pageTitle: "Cart"
+    Cart.fetchCartData(cart => {
+        Product.fetchAll(products => {
+            const cartProducts = []
+            for (product of products) {
+                existingProduct = cart.products.find(prod => prod.id === product.id);
+                if (existingProduct) {
+                    cartProducts.push({
+                        product: product,
+                        quantity: existingProduct.quantity
+                    })
+                }
+            }
+
+            res.render('shop/cart', {
+                path: "/cart",
+                pageTitle: "Cart",
+                cartProducts: cartProducts
+            })
+        })
     })
 }
 

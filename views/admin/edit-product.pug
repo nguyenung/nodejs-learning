@@ -8,17 +8,41 @@ block content
     .form-wrapper
         form(action=(editMode ? `/admin/edit-product` : '/admin/add-product'), method="POST", class="add-product")
             label(for='product-title') Product title
-            input#product-title(type='text' required name='title' value=(editMode ? product.title : ''))
+            input#product-title(
+                type='text'
+                required
+                name='title'
+                autocomplete='off'
+                value=(editMode ? product.title : '')
+            )
 
             label(for='product-imageUrl') Product image URL
-            input#product-imageUrl(type='text' required name='imageUrl' value=(editMode ? product.imageUrl : ''))
+            input#product-imageUrl(
+                type='text' 
+                required 
+                name='imageUrl' 
+                autocomplete='off' 
+                value=(editMode ? product.imageUrl : '')
+            )
 
             label(for='product-description') Product description
-            input#product-description(type='text' name='description' value=(editMode ? product.description : ''))
+            input#product-description(
+                type='text' 
+                name='description' 
+                autocomplete='off' 
+                value=(editMode ? product.description : '')
+            )
 
             label(for='product-price') Product price
-            input#product-price(type='number' step='0.01' required name='price' value=(editMode ? product.price : ''))
+            input#product-price(
+                type='number' 
+                step='0.01' 
+                required 
+                name='price' 
+                autocomplete='off' 
+                value=(editMode ? product.price : '')
+            )
 
             if editMode
-                input(type="hidden", name="productId" value=product.id)
+                input(type="hidden" name="productId" value=product.id)
             button(type='submit')= (editMode) ? 'Update' : 'Add'

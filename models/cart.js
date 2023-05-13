@@ -24,9 +24,6 @@ module.exports = class Cart {
         //fetch current list product
         fs.readFile(cartFilePath, (err, fileContent) => {
             let cart = {products: [], totalPrice: 0}
-            if (fileContent === '') {
-                fileContent = '[]'
-            }
             if(!err) {
                 if (helpers.isValidJSON(fileContent)) {
                     cart = JSON.parse(fileContent)
@@ -86,6 +83,26 @@ module.exports = class Cart {
                     })
                 }
                 
+            }
+        })
+    }
+
+    /**
+     * Fetch cart data from data file.
+     *
+     * @param {function} cb - The callback function to invoke with the cart data.
+     * @returns {void}
+     */
+    static fetchCartData(cb) {
+        fs.readFile(cartFilePath, (err, fileContent) => {
+            let cart = {products: [], totalPrice: 0}
+            if (!err) {
+                if (helpers.isValidJSON(fileContent)) {
+                    cart = JSON.parse(fileContent)
+                }
+                cb(cart)
+            } else {
+                cb([])
             }
         })
     }
