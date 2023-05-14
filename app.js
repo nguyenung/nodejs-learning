@@ -17,23 +17,23 @@ const app = express()
 
 app.use(connectLiveReload())
 
-// 1. chỉ định template engine, views folder
+// 1. set template engine and views folder
 app.set('view engine', 'pug')
 app.set('views', 'views')
 
-/**************************
- *** Nạp các middleware ***
- **************************/
+/****************************
+ *** Implement middleware ***
+ ***************************/
 
 // 2. load body-parser
-// mục đích của body parser: lấy dữ liệu từ request đưa vào req.body
+// fill data from request to req.body
 app.use(bodyParser.urlencoded({extended: true}))
 
-// 3. chỉ định folder static
+// 3. config folder static
 app.use(express.static('public'))
 
-// 4. nạp các route
-//app.use(1 instance của express.Router())
+// 4. load route
+//app.use(an instance of express.Router())
 const shopRouters = require('./route/shop')
 const adminRouters = require('./route/admin')
 

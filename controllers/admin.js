@@ -1,12 +1,17 @@
-const Product = require('./../models/product');
+const Product = require('./../models/product')
+const helpers = require('./../utils/helpers')
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
+    Product.fetchAll()
+    .then(([rows, fields]) => {
         res.render('admin/products', {
             path: "/admin/products",
-            products: products,
+            products: rows,
             pageTitle: "Admin - All product"
         })
+    })
+    .catch(err => {
+        helpers.errorHandle(err)
     })
 }
 
@@ -31,7 +36,9 @@ exports.postAddProduct = (req, res, next) => {
 
 exports.getEditProduct = (req, res, next) => {
     const productId = req.params.productId
-    Product.findById(productId, (product) => {
+    Product.findById(productId)
+    .then(([rows]) => {
+        const product = rows.length > 0 ? rows[0] : null;
         if (!product) {
             return res.redirect('/')
         }
@@ -42,34 +49,55 @@ exports.getEditProduct = (req, res, next) => {
             product: product,
         })
     })
+    .catch(err => {
+        helpers.errorHandle(err)
+    })
+}
+
+const saveProduct = (productId, updateData) => {
+    const updatedProduct = new Product(
+        productId,
+        updateData.title,
+        updateData.imageUrl,
+        updateData.description,
+        updateData.price,
+    )
+    return updatedProduct.save()
 }
 
 exports.doEditProduct = (req, res, next) => {
     const productId = req.body.productId
-    Product.findById(productId, product => {
-        if ( !product ) {
-            throw new Error("Product not found.");
+
+    Product.findById(productId)
+    .then(([rows]) => {
+        const product = rows.length > 0 ? rows[0] : null;
+        if (!product) {
+            throw new Error('Product not found.');
         }
-        const updatedProduct = new Product(
-            productId,
-            req.body.title,
-            req.body.imageUrl,
-            req.body.description,
-            req.body.price,
-        )
-        
-        updatedProduct.save()
+        return saveProduct(productId, req.body)
+    })
+    .then(() => {
         res.redirect('/admin/products')
+    })
+    .catch(err => {
+        helpers.errorHandle(err)
     })
 }
 
 exports.doDeleteProduct = (req, res, next) => {
     const productId = req.body.productId
-    Product.findById(productId, product => {
+    Product.findById(productId)
+    .then(([rows]) => {
+        const product = rows.length > 0 ? rows[0] : null;
         if (!product) {
             throw new Error(`Product not found: ${productId}`)
         }
-        Product.delete(productId)
+        return Product.delete(product.id)
+    })
+    .then(() => {
         res.redirect('/admin/products')
+    })
+    .catch(err => {
+        helpers.errorHandle(err)
     })
 }

@@ -2,37 +2,14 @@ const helpers = require('./../utils/helpers');
 const fs = require('fs');
 const path = require('path');
 const Cart = require('./cart');
+const db = require('./../utils/database')
 
 /**
- * The absolute file path for the products data file.
+ * The table name
  *
  * @constant {string}
  */
-const productFilePath = path.join(
-    helpers.rootPath(),
-    '.data',
-    'products.json'
-)
-
-/**
- * Read products from a file and invoke a callback with the parsed data.
- *
- * @param {function} callback - The callback function to invoke with the parsed data.
- * @returns {void}
- */
-const getProductsFromFile = (callback) => {
-    fs.readFile(productFilePath, (error, fileContent) => {
-        if (!error) {
-            if (helpers.isValidJSON(fileContent)) {
-                return callback(JSON.parse(fileContent))
-            } else {
-                return callback([])
-            }
-        } else {
-            return callback([])
-        }
-    })
-}
+const tableName = 'products'
 
 module.exports = class Product {
     constructor(id, title, imageUrl, description, price) {
@@ -49,28 +26,20 @@ module.exports = class Product {
      * @returns {void}
      */
     save() {
-        getProductsFromFile(products => {
-            if (this.id) {
-                const existingProductIndex = products.findIndex(product => product.id === this.id)
-                const updatedProducts = [...products]
-                updatedProducts[existingProductIndex] = this
-
-                fs.writeFile(productFilePath, JSON.stringify(updatedProducts), (err) => {
-                    if(err) {
-                        console.log(err)
-                    }
-                })
-            } else {
-                this.id = Date.now().toString()
-                products.push(this)
-                
-                fs.writeFile(productFilePath, JSON.stringify(products), (err) => {
-                    if(err) {
-                        console.log(err)
-                    }
-                })
+        const { title, description, imageUrl, price } = this
+        const values = [title, description, imageUrl, price]
+        let query
+        if (this.id) {
+            const existingProduct = Product.findById(this.id)
+            if (!existingProduct) {
+                throw new Error("Product not found.")
             }
-        })
+            values.push(this.id)
+            query = `UPDATE ${tableName} SET title = ?, description = ?, imageUrl = ?, price = ? WHERE id = ?`
+        } else {
+            query = `INSERT INTO ${tableName} (title, description, imageUrl, price) VALUES (?, ?, ?, ?)`
+        }
+        return db.query(query, values)
     }
 
     /**
@@ -80,21 +49,19 @@ module.exports = class Product {
      * @param {function} cb - The callback function to invoke with the found product.
      * @returns {void}
      */
-    static findById(productId, cb) {
-        getProductsFromFile(products => {
-            const product = products.find(p => p.id === productId)
-            cb(product)
-        })
+    static findById(productId) {
+        const query = `SELECT * FROM ${tableName} WHERE id = ?`
+        const params = [productId]
+        return db.query(query, params)
     }
 
     /**
-     * Fetch all product from data file.
+     * Fetch all product from database
      *
-     * @param {function} cb - The callback function to invoke with the found products.
      * @returns {void}
      */
-    static fetchAll(callback) {
-        getProductsFromFile(callback)
+    static fetchAll() {
+        return db.query('SELECT * FROM products')
     }
     
     /**
@@ -104,20 +71,8 @@ module.exports = class Product {
      * @returns {void}
      */
     static delete(productId) {
-        getProductsFromFile(products => {
-            const productToDelete = products.find(product => product.id === productId)
-            const updatedProducts = products.filter(
-                product => product.id !== productId
-            )
-
-            fs.writeFile(productFilePath, JSON.stringify(updatedProducts), (err) => {
-                if (err) {
-                    console.log('err write file when delete: ', err)
-                } else {
-                    //Delete in cart
-                    Cart.deleteProduct(productId, productToDelete.price)
-                }
-            })
-        })
+        const query = `DELETE FROM ${tableName} WHERE id = ?`
+        const params = [productId]
+        return db.query(query, params)
     }
 }
