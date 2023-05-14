@@ -14,5 +14,10 @@ const isValidJSON = (str) => {
     }
 }
 
+const errorHandle = (error) => {
+    console.log(`Error: `, error)
+}
+
 exports.rootPath = rootPath
 exports.isValidJSON = isValidJSON
+exports.errorHandle = errorHandle
