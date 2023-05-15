@@ -22,15 +22,16 @@ exports.getAddProduct = (req, res, next) => {
     })
 }
 
-exports.postAddProduct = (req, res, next) => {
-    const product = new Product(
-        null,
-        req.body.title,
-        req.body.imageUrl,
-        req.body.description,
-        req.body.price,
-    )
-    product.save()
+exports.postAddProduct = async (req, res, next) => {
+    const newProduct = await Product.create({
+        title: req.body.title,
+        imageUrl: req.body.imageUrl,
+        description: req.body.description,
+        price: req.body.price,
+    })
+        .then(result => {console.log(result.toJSON())})
+        .catch(err => {console.log(err)})
+    
     res.redirect('/')
 }
 
