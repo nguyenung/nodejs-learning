@@ -2,7 +2,6 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const express = require('express')
 const errorController = require('./controllers/error');
-const sequelize = require('./utils/database');
 
 //Live reload when save file
 const livereload = require('livereload')
@@ -44,10 +43,4 @@ app.use(shopRouters.router)
 // 5. set 404 page
 app.use(errorController.pageNotFound)
 
-sequelize.sync()
-  .then(result => {
-    app.listen(3000)
-  })
-  .catch(err => {
-    console.log(err)
-  })
+app.listen(3000)
