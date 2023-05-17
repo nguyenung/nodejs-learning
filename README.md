@@ -10,10 +10,24 @@ The source code in this project is referenced from the course `NodeJS - The Comp
 
 Instructions on how to install this project.
 
-1. Clone the repository: `git clone git@github.com:nguyenung/nodejs-learning.git`
+1. Clone the repository:
+   ```
+   git clone git@github.com:nguyenung/nodejs-learning.git
+   ```
 2. Install dependencies:
-   - _Using npm:_ `npm install`
-   - _Using make:_ `make install`
+   - _Using npm:_
+   ```
+   npm install
+   ```
+   - _Using make:_
+   ```
+   make install
+   ```
+
+3. Create .env file from .env.example
+   ```
+   cp .env.example .env
+   ```
 
 ## Usage
 
