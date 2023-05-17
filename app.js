@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser')
 const express = require('express')
-const errorController = require('./controllers/error');
+const errorController = require('./controllers/error')
+const { User } = require('./models')
 
 //Live reload when save file
 const livereload = require('livereload')
@@ -30,6 +31,15 @@ app.use(bodyParser.urlencoded({extended: true}))
 
 // 3. config folder static
 app.use(express.static('public'))
+
+app.use((req, res, next) => {
+    User.findByPk(1)
+    .then(user => {
+        req.user = user
+        next()
+    })
+    .catch(err => {console.log(err)})
+})
 
 // 4. load route
 //app.use(an instance of express.Router())

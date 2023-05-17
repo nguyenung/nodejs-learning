@@ -2,7 +2,7 @@ const { Product } = require('./../models');
 const helpers = require('./../utils/helpers')
 
 exports.getProducts = (req, res, next) => {
-    Product.findAll({
+    req.user.getProducts({
         order: [['id', 'desc']]
     })
     .then(products => {
@@ -24,8 +24,8 @@ exports.getAddProduct = (req, res, next) => {
     })
 }
 
-exports.postAddProduct = async (req, res, next) => {
-    await Product.create({
+exports.postAddProduct = (req, res, next) => {
+    req.user.createProduct({
         title: req.body.title,
         imageUrl: req.body.imageUrl,
         description: req.body.description,
@@ -39,8 +39,12 @@ exports.postAddProduct = async (req, res, next) => {
 
 exports.getEditProduct = (req, res, next) => {
     const productId = req.params.productId
-    Product.findByPk(productId)
-    .then(product => {
+    req.user.getProducts({where: {id: productId}})
+    .then(products => {
+        const product = products[0]
+        if(!product) {
+            throw new Error('Product not found.')
+        }
         res.render('admin/edit-product', {
             path: "/admin/edit-product",
             pageTitle: "Edit product",

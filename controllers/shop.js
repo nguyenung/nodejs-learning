@@ -1,5 +1,6 @@
 // const Product = require('../models/product');
 const { Product } = require('./../models');
+const helpers = require('./../utils/helpers');
 
 
 // const Cart = require('../models/cart');
@@ -20,16 +21,17 @@ exports.getProducts = (req, res, next) => {
     })
 }
 
-exports.getProduct = (req, res, next) => {
-    Product.findByPk(req.params.productId)
-    .then((product) => {
+exports.getProduct = async (req, res, next) => {
+    try {
+        const product = await Product.findByPk(req.params.productId)
+        const user = await product.getUser()
         res.render('shop/product-detail', {
-            product: product
+            product: product,
+            user: user,
         })
-    })
-    .catch(err => {
-        console.log(err)
-    })
+    } catch (err) {
+        helpers.errorHandle(err)
+    }
 }
 
 exports.getIndexPage = (req, res, next) => {
