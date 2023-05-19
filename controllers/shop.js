@@ -1,5 +1,5 @@
 // const Product = require('../models/product');
-const { Product } = require('./../models');
+const { Product, Cart } = require('./../models');
 const helpers = require('./../utils/helpers');
 
 
@@ -9,16 +9,14 @@ exports.getProducts = (req, res, next) => {
     Product.findAll({
         order: [['id', 'desc']]
     })
-    .then(products => {
-        res.render('shop/product-list', {
-            path: "/products",
-            products: products,
-            pageTitle: "All product"
+        .then(products => {
+            res.render('shop/product-list', {
+                path: "/products",
+                products: products,
+                pageTitle: "All product"
+            })
         })
-    })
-    .catch(err => {
-        console.log(err)
-    })
+        .catch(err => console.log(err))
 }
 
 exports.getProduct = async (req, res, next) => {
@@ -38,50 +36,77 @@ exports.getIndexPage = (req, res, next) => {
     Product.findAll({
         order: [['id', 'desc']]
     })
-    .then(products => {
-        res.render('shop/index', {
-            path: "/",
-            products: products,
-            pageTitle: "Shop"
+        .then(products => {
+            res.render('shop/index', {
+                path: "/",
+                products: products,
+                pageTitle: "Shop"
+            })
         })
-    })
-    .catch(err => {
-        console.log(err)
-    })
+        .catch(err => console.log(err))
 }
 
-exports.getCartPage = (req, res, next) => {
-    Cart.fetchCartData(cart => {
-        Product.fetchAll(products => {
-            let cartData = {
-                products: [],
-                totalPrice: cart.totalPrice
+exports.getCartPage = async (req, res, next) => {
+    Cart.findOne({
+        where: { userId: req.user.id },
+        include: [
+            {
+                model: Product,
+                through: { attributes: ['quantity'] } // Include the quantity attribute from the CartItem model
             }
-            for (product of products) {
-                existingProduct = cart.products.find(prod => prod.id === product.id);
-                if (existingProduct) {
-                    cartData.products.push({
-                        product: product,
-                        quantity: existingProduct.quantity
-                    })
-                }
-            }
-
+        ]
+    })
+        .then((cart) => {
+            const cartData = cart ? cart.toJSON() : null
             res.render('shop/cart', {
                 path: "/cart",
                 pageTitle: "Cart",
                 cartData: cartData
             })
         })
-    })
+        .catch((error) => console.error('Error retrieving cart:', error));
 }
 
-exports.addToCart = (req, res, next) => {
+exports.addToCart = async (req, res, next) => {
     const productId = req.body.productId
-    Product.findById(productId, (product) => {
-        Cart.addProduct(productId, product.price)
+    let fetchedCart
+    let totalPrice
+    try {
+        let cart = await req.user.getCart()
+        if (!cart) {
+            cart = await req.user.createCart({
+                totalPrice: 0
+            })
+        }
+
+        fetchedCart = cart
+        const cartProducts = await cart.getProducts({
+            where: {id: productId}
+        })
+        let product
+        if (cartProducts.length > 0) {
+            product = cartProducts[0]
+        }
+        let newQuantity
+        if (product) {
+            const oldQuantity = product.CartItem.quantity
+            newQuantity = oldQuantity + 1
+        } else {
+            newQuantity = 1
+            product = await Product.findByPk(productId)
+        }
+        fetchedCart.addProduct(product, {through: {
+            quantity: newQuantity
+        }})
+
+        let old = cart.totalPrice
+        old += product.price
+        cart.totalPrice = old
+        await cart.save()
         res.redirect('/cart')
-    })
+    } catch (err) {
+        console.error('Error when add to cart:', err)
+    }
 }
 
 exports.deleteCartItem = (req, res, next) => {

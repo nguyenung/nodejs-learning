@@ -5,18 +5,18 @@ block style
 
 block content
     h1 Your cart
-        if (cartData.products.length)
+        if (cartData && cartData.Products.length)
             h3 Total amount: $#{cartData.totalPrice}
             .product-list
                 .grid
-                    each cartItem in cartData.products
+                    each productItem in cartData.Products
                         .card
-                            img(src=`${cartItem.product.imageUrl}` alt="Image" style='width:100%')
-                            h1 #{cartItem.product.title}($#{cartItem.product.price})
-                            p.price Quantity: #{cartItem.quantity}
+                            img(src=`${productItem.imageUrl}` alt="Image" style='width:100%')
+                            h1 #{productItem.title}($#{productItem.price})
+                            p.price Quantity: #{productItem.CartItem.quantity}
                             p
                                 form(action="/delete-cart-item" method="POST")
-                                    input(type="hidden", name="productId" value=cartItem.product.id)
+                                    input(type="hidden", name="productId" value=productItem.id)
                                     button(type="submit" class="button-red") Remove 
         else
             p Nothing here
