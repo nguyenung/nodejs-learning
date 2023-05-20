@@ -75,7 +75,7 @@ exports.doEditProduct = async (req, res, next) => {
         }
         res.redirect('/admin/products')
     } catch(err) {
-        console.error('Error updating record:', error);
+        console.error('Error updating record:', err);
     }
 }
 
@@ -85,7 +85,7 @@ exports.doDeleteProduct = async (req, res, next) => {
     if (product) {
         await product.destroy()
     } else {
-        throw new Error('Record not found')
+        throw new Error('Record not found.')
     }
     res.redirect('/admin/products')
 }

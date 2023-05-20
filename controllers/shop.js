@@ -1,4 +1,5 @@
-const { Product, Cart } = require('./../models');
+const { Product, Cart, sequelize } = require('./../models');
+
 const helpers = require('./../utils/helpers');
 
 exports.getProducts = (req, res, next) => {
@@ -66,7 +67,6 @@ exports.getCartPage = async (req, res, next) => {
 exports.addToCart = async (req, res, next) => {
     const productId = req.body.productId
     let fetchedCart
-    let totalPrice
     try {
         let cart = await req.user.getCart()
         if (!cart) {
@@ -124,7 +124,37 @@ exports.deleteCartItem = async (req, res, next) => {
         await cart.save()
          res.redirect('/cart');
     } catch (err) {
-        console.log(err)
+        helpers.errorHandle(err)
+    }
+}
+
+exports.createOrder = async (req, res, next) => {
+    try {
+        const cart = await req.user.getCart()
+        if (!cart) {
+            res.redirect('/')
+        }
+
+        await sequelize.transaction(async (transaction) => {
+            try {
+                const order = await req.user.createOrder({
+                    totalPrice: cart.totalPrice
+                }, {transaction: transaction})
+                const cartProducts = await cart.getProducts()
+                await order.addProducts(cartProducts.map(product => {
+                    product.OrderItem = {quantity: product.CartItem.quantity}
+                    return product
+                }), {transaction: transaction})
+                transaction.commit()
+            } catch(err) {
+                transaction.rollback()
+                helpers.errorHandle(err)
+            }
+        });
+
+        res.redirect('/orders');
+    } catch(err) {
+        helpers.errorHandle(err)
     }
 }
 
