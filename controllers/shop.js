@@ -1,9 +1,5 @@
-// const Product = require('../models/product');
 const { Product, Cart } = require('./../models');
 const helpers = require('./../utils/helpers');
-
-
-// const Cart = require('../models/cart');
 
 exports.getProducts = (req, res, next) => {
     Product.findAll({
@@ -11,9 +7,9 @@ exports.getProducts = (req, res, next) => {
     })
         .then(products => {
             res.render('shop/product-list', {
-                path: "/products",
+                path: '/products',
                 products: products,
-                pageTitle: "All product"
+                pageTitle: 'All product'
             })
         })
         .catch(err => console.log(err))
@@ -38,9 +34,9 @@ exports.getIndexPage = (req, res, next) => {
     })
         .then(products => {
             res.render('shop/index', {
-                path: "/",
+                path: '/',
                 products: products,
-                pageTitle: "Shop"
+                pageTitle: 'Shop'
             })
         })
         .catch(err => console.log(err))
@@ -59,8 +55,8 @@ exports.getCartPage = async (req, res, next) => {
         .then((cart) => {
             const cartData = cart ? cart.toJSON() : null
             res.render('shop/cart', {
-                path: "/cart",
-                pageTitle: "Cart",
+                path: '/cart',
+                pageTitle: 'Cart',
                 cartData: cartData
             })
         })
@@ -109,27 +105,39 @@ exports.addToCart = async (req, res, next) => {
     }
 }
 
-exports.deleteCartItem = (req, res, next) => {
+exports.deleteCartItem = async (req, res, next) => {
     const productId = req.body.productId
-    Product.findById(productId, product => {
-        if (!product) {
-            return res.redirect('/')
+    try {
+        let cart = await req.user.getCart()
+        if (!cart) {
+            res.redirect('/');
         }
-        Cart.deleteProduct(product.id, product.price)
-        return res.redirect('/cart')
-    })
+        const cartProducts = await cart.getProducts({where: {id: productId}})
+        if (cartProducts.length === 0) {
+            throw new Error('Product invalid.')
+        }
+        const product = cartProducts[0]
+        const cartItem = product.CartItem
+        const newTotalPrice = cart.totalPrice - product.price * cartItem.quantity
+        await cartItem.destroy()
+        cart.totalPrice = newTotalPrice
+        await cart.save()
+         res.redirect('/cart');
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 exports.getOrdersPage = (req, res, next) => {
     res.render('shop/orders', {
-        path: "/orders",
-        pageTitle: "Your orders"
+        path: '/orders',
+        pageTitle: 'Your orders'
     })
 }
 
 exports.getCheckoutPage = (req, res, next) => {
     res.render('shop/checkout', {
-        path: "/checkout",
-        pageTitle: "Checkout"
+        path: '/checkout',
+        pageTitle: 'Checkout'
     })
 }
