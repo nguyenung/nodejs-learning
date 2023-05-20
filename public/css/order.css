@@ -1,0 +1,17 @@
+.orders-wrapper .order-item {
+    border-bottom: 1px solid gray;
+}
+
+.orders-wrapper h4.order-summary {
+    font-weight: normal;
+    color: gray;
+}
+
+.orders-wrapper .order-item ul {
+    padding-left: 40px;
+}
+
+.orders-wrapper .order-item ul li {
+    list-style: circle;
+    display: list-item;
+}

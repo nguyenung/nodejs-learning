@@ -122,7 +122,7 @@ exports.deleteCartItem = async (req, res, next) => {
         await cartItem.destroy()
         cart.totalPrice = newTotalPrice
         await cart.save()
-         res.redirect('/cart');
+        res.redirect('/cart');
     } catch (err) {
         helpers.errorHandle(err)
     }
@@ -141,11 +141,19 @@ exports.createOrder = async (req, res, next) => {
                     totalPrice: cart.totalPrice
                 }, {transaction: transaction})
                 const cartProducts = await cart.getProducts()
+                //create order items
                 await order.addProducts(cartProducts.map(product => {
                     product.OrderItem = {quantity: product.CartItem.quantity}
                     return product
                 }), {transaction: transaction})
-                transaction.commit()
+
+                //reset cart's totalPrice
+                cart.totalPrice = 0
+                await cart.save()
+
+                //remove all products from cart
+                // await cart.removeProducts(cartProducts)
+                await cart.setProducts(null)
             } catch(err) {
                 transaction.rollback()
                 helpers.errorHandle(err)
@@ -158,10 +166,20 @@ exports.createOrder = async (req, res, next) => {
     }
 }
 
-exports.getOrdersPage = (req, res, next) => {
+exports.getOrdersPage = async (req, res, next) => {
+    const orderData = await req.user.getOrders({
+        where: {userId: req.user.id},
+        include: [
+            {
+                model: Product,
+                through: { attributes: ['quantity'] } // Include the quantity attribute from the OrderItem model
+            }
+        ]
+    })
     res.render('shop/orders', {
         path: '/orders',
-        pageTitle: 'Your orders'
+        pageTitle: 'Your orders',
+        orderData: orderData
     })
 }
 

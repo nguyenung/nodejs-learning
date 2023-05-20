@@ -1,4 +1,25 @@
 extends ../layout/main.pug
 
+block style
+    link(rel="stylesheet", href="css/order.css", type="text/css")
+
 block content
     h1 Your orders
+    .orders-wrapper
+        if(orderData)
+            each order in orderData
+                .order-item
+                    h4.order-summary ##{order.id} - $#{order.totalPrice} - #{order.createdAt}
+                    p Details
+                    if (order.Products && order.Products.length > 0)
+                        ul
+                            each product in order.Products
+                                li
+                                    p Product:
+                                        b #{product.title}
+                                    p Quantity: #{product.OrderItem.quantity} - Price: $#{product.price}
+                    else
+                        p
+                            i This order has not detail
+        else
+            h3 Nothings here
