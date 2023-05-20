@@ -6,17 +6,20 @@ block style
 block content
     h1 Your cart
         if (cartData && cartData.Products.length)
-            h3 Total amount: $#{cartData.totalPrice}
             .product-list
                 .grid
                     each productItem in cartData.Products
                         .card
                             img(src=`${productItem.imageUrl}` alt="Image" style='width:100%')
-                            h1 #{productItem.title}($#{productItem.price})
+                            h6.product-title #{productItem.title}($#{productItem.price})
                             p.price Quantity: #{productItem.CartItem.quantity}
                             p
                                 form(action="/delete-cart-item" method="POST")
                                     input(type="hidden", name="productId" value=productItem.id)
-                                    button(type="submit" class="button-red") Remove 
+                                    button(type="submit" class="button-red") Remove
+            .order-form
+                h5 Total amount: $#{cartData.totalPrice}
+                form(action="/create-order", method="post")
+                    button(type="submit" class="button button-blue") Order now!
         else
             p Nothing here
