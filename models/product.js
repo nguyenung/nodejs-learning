@@ -1,24 +1,32 @@
-const {
-    Model
-} = require('sequelize');
+const { getDb } = require('./../utils/database')
+const helpers = require('./../utils/helpers');
 
-module.exports = (sequelize, DataTypes) => {
-    class Product extends Model {
-        static associate(models) {
-            Product.belongsTo(models.User, { foreignKey: 'userId' })
-            Product.belongsToMany(models.Cart, { through: models.CartItem })
-            Product.belongsToMany(models.Order, { through: models.OrderItem })
-        }
+class Product {
+    constructor(title, description, imageUrl, price) {
+        this.title = title
+        this.description = description
+        this.imageUrl = imageUrl
+        this.price = price
     }
-    Product.init({
-        title: DataTypes.STRING,
-        description: DataTypes.STRING,
-        price: DataTypes.DOUBLE,
-        imageUrl: DataTypes.STRING,
-        userId: DataTypes.INTEGER,
-    }, {
-        sequelize,
-        modelName: 'Product',
-    });
-    return Product;
-};
+
+    save() {
+        const db = getDb()
+        return db.collection('products').insertOne(this)
+            .then((result) => {
+                console.log(result)
+            }).catch(err => helpers.handleError(err))
+    }
+
+    static fetchAll() {
+        const db = getDb()
+        return db.collection('products')
+        .find()
+        .toArray()
+        .then((products) => {
+            return products
+        })
+        .catch(err => helpers.handleError(err))
+    }
+}
+
+module.exports = Product

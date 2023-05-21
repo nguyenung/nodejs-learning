@@ -1,17 +1,31 @@
-require('dotenv').config()
-const { Sequelize } = require('sequelize')
+const mongodb = require('mongodb')
+const MongoClient = mongodb.MongoClient
 
-const sequelize = new Sequelize(
-    process.env.DB_NAME,
-    process.env.DB_USER,
-    process.env.DB_PASSWORD,
-    {
-        dialect: 'mysql',
-        host: process.env.DB_HOST,
-        dialectOptions: {
-            socketPath: '/tmp/mysql.sock'
-        }
+const dotenv = require('dotenv');
+
+dotenv.config()
+const environment = process.env.NODE_ENV || 'local'
+
+dotenv.config({ path: `.env.${environment}` })
+
+let _db
+
+const mongoConnect = callback => {
+    MongoClient.connect(process.env.DB_MONGODB_CREDENTIAL)
+    .then(result => {
+        console.log('Connected to mongodb cloud.')
+        _db = result.db()
+        callback()
+    })
+    .catch(err => console.log(err))
+}
+
+const getDb = () => {
+    if (_db) {
+        return _db
     }
-)
+    throw 'No database found'
+}
 
-module.exports = sequelize
+exports.mongoConnect = mongoConnect
+exports.getDb = getDb

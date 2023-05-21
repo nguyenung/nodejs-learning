@@ -1,7 +1,8 @@
 const bodyParser = require('body-parser')
 const express = require('express')
 const errorController = require('./controllers/error')
-const { User } = require('./models')
+const mongoConnect = require('./utils/database').mongoConnect;
+// const { User } = require('./models')
 
 //Live reload when save file
 const livereload = require('livereload')
@@ -9,7 +10,7 @@ const connectLiveReload = require('connect-livereload')
 const liveReloadServer = livereload.createServer();
 liveReloadServer.server.once("connection", () => {
     setTimeout(() => {
-      liveReloadServer.refresh("/");
+        liveReloadServer.refresh("/");
     }, 100);
 });
 
@@ -27,29 +28,34 @@ app.set('views', 'views')
 
 // 2. load body-parser
 // fill data from request to req.body
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // 3. config folder static
 app.use(express.static('public'))
 
-app.use((req, res, next) => {
+/* app.use((req, res, next) => {
     User.findByPk(1)
     .then(user => {
         req.user = user
         next()
     })
     .catch(err => {console.log(err)})
-})
+}) */
 
 // 4. load route
 //app.use(an instance of express.Router())
+
+
 const shopRouters = require('./route/shop')
 const adminRouters = require('./route/admin')
 
 app.use('/admin', adminRouters.router)
 app.use(shopRouters.router)
 
+
 // 5. set 404 page
 app.use(errorController.pageNotFound)
 
-app.listen(3000)
+mongoConnect(() => {
+    app.listen(3000)
+})
