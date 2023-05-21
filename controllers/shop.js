@@ -16,11 +16,11 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = async (req, res, next) => {
     try {
-        const product = await Product.findByPk(req.params.productId)
-        const user = await product.getUser()
+        const product = await Product.findById(req.params.productId);
+        console.log(product)
         res.render('shop/product-detail', {
             product: product,
-            user: user,
+            pageTitle: product.title
         })
     } catch (err) {
         helpers.errorHandle(err)

@@ -9,7 +9,6 @@ block content
             img(src=product.imageUrl, alt=product.title)
             h2 #{product.title}
             h3.price $#{product.price}
-            h4 Owner: #{user.name}
             p #{product.description}
             include _add-to-cart.pug
     else

@@ -44,5 +44,5 @@ block content
             )
 
             if editMode
-                input(type="hidden" name="productId" value=product.id)
+                input(type="hidden" name="productId" value=product._id)
             button(type='submit')= (editMode) ? 'Update' : 'Add'
