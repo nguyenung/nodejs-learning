@@ -15,7 +15,7 @@ block content
                             p.price Quantity: #{productItem.CartItem.quantity}
                             p
                                 form(action="/delete-cart-item" method="POST")
-                                    input(type="hidden", name="productId" value=productItem.id)
+                                    input(type="hidden", name="productId" value=productItem._id)
                                     button(type="submit" class="button-red") Remove
             .order-form
                 h5 Total amount: $#{cartData.totalPrice}

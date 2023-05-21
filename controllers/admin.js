@@ -23,22 +23,22 @@ exports.getAddProduct = (req, res, next) => {
     })
 }
 
-exports.postAddProduct = (req, res, next) => {
+exports.postAddProduct = async (req, res, next) => {
     const { title, description, imageUrl, price } = req.body;
     const product = new Product(title, description, imageUrl, price);
-    product.save()
-        .then(result => {console.log(result)})
-        .catch(err => {console.log(err)})
-    
-    res.redirect('/')
+    try {
+        await product.save()
+        res.redirect('/')
+    } catch (error) {
+        throw error
+    }
 }
 
-exports.getEditProduct = (req, res, next) => {
+exports.getEditProduct = async (req, res, next) => {
     const productId = req.params.productId
-    req.user.getProducts({where: {id: productId}})
-    .then(products => {
-        const product = products[0]
-        if(!product) {
+    try {
+        const product = await Product.findById(productId)
+        if (!product) {
             throw new Error('Product not found.')
         }
         res.render('admin/edit-product', {
@@ -47,28 +47,25 @@ exports.getEditProduct = (req, res, next) => {
             editMode: true,
             product: product,
         })
-    })
-    .catch(err => {
+    } catch(err) {
         helpers.errorHandle(err)
-    })
+    }
 }
 
 exports.doEditProduct = async (req, res, next) => {
     const productId = req.body.productId
     try {
-        const product = await Product.findByPk(productId)
-        if (product) {
-            await product.update(
-                {
-                    title: req.body.title,
-                    imageUrl: req.body.imageUrl,
-                    description: req.body.description,
-                    price: req.body.price,
-                }
-            )
-        } else {
-            throw new Error('Record not found')
+        const product = await Product.findById(productId)
+        if (!product) {
+            throw new Error('Product not found.')
         }
+        const updatedFields = {
+            title: req.body.title,
+            imageUrl: req.body.imageUrl,
+            description: req.body.description,
+            price: req.body.price,
+        }
+        await Product.updateProductById(productId, updatedFields)
         res.redirect('/admin/products')
     } catch(err) {
         console.error('Error updating record:', err);
@@ -77,11 +74,10 @@ exports.doEditProduct = async (req, res, next) => {
 
 exports.doDeleteProduct = async (req, res, next) => {
     const productId = req.body.productId
-    const product = await Product.findByPk(productId)
-    if (product) {
-        await product.destroy()
-    } else {
-        throw new Error('Record not found.')
+    try {
+        await Product.deleteProductById(productId)
+        res.redirect('/admin/products')
+    } catch (error) {
+        helpers.errorHandle(error)
     }
-    res.redirect('/admin/products')
 }
