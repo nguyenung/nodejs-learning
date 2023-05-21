@@ -1,10 +1,9 @@
-const { Product } = require('./../models');
+// const { Product } = require('./../models');
+const Product = require('./../models/product')
 const helpers = require('./../utils/helpers')
 
 exports.getProducts = (req, res, next) => {
-    req.user.getProducts({
-        order: [['id', 'desc']]
-    })
+    Product.fetchAll()
     .then(products => {
         res.render('admin/products', {
             path: "/admin/products",
@@ -25,13 +24,10 @@ exports.getAddProduct = (req, res, next) => {
 }
 
 exports.postAddProduct = (req, res, next) => {
-    req.user.createProduct({
-        title: req.body.title,
-        imageUrl: req.body.imageUrl,
-        description: req.body.description,
-        price: req.body.price,
-    })
-        .then(result => {console.log(result.toJSON())})
+    const { title, description, imageUrl, price } = req.body;
+    const product = new Product(title, description, imageUrl, price);
+    product.save()
+        .then(result => {console.log(result)})
         .catch(err => {console.log(err)})
     
     res.redirect('/')

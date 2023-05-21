@@ -7,18 +7,18 @@ router.get('/', shopController.getIndexPage)
 
 router.get('/products', shopController.getProducts)
 
-router.get('/products/:productId', shopController.getProduct)
+// router.get('/products/:productId', shopController.getProduct)
 
-router.get('/cart', shopController.getCartPage)
+// router.get('/cart', shopController.getCartPage)
 
-router.post('/cart', shopController.addToCart)
+// router.post('/cart', shopController.addToCart)
 
-router.post('/delete-cart-item', shopController.deleteCartItem)
+// router.post('/delete-cart-item', shopController.deleteCartItem)
 
-router.get('/orders', shopController.getOrdersPage)
+// router.get('/orders', shopController.getOrdersPage)
 
-router.post('/create-order', shopController.createOrder)
+// router.post('/create-order', shopController.createOrder)
 
-router.get('/checkout', shopController.getCheckoutPage)
+// router.get('/checkout', shopController.getCheckoutPage)
 
 exports.router = router

@@ -1,11 +1,9 @@
-const { Product, Cart, sequelize } = require('./../models');
+const Product = require('./../models/product');
 
 const helpers = require('./../utils/helpers');
 
 exports.getProducts = (req, res, next) => {
-    Product.findAll({
-        order: [['id', 'desc']]
-    })
+    Product.fetchAll()
         .then(products => {
             res.render('shop/product-list', {
                 path: '/products',
@@ -30,9 +28,7 @@ exports.getProduct = async (req, res, next) => {
 }
 
 exports.getIndexPage = (req, res, next) => {
-    Product.findAll({
-        order: [['id', 'desc']]
-    })
+    Product.fetchAll()
         .then(products => {
             res.render('shop/index', {
                 path: '/',
