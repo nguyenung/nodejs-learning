@@ -9,9 +9,9 @@ router.get('/products', shopController.getProducts)
 
 router.get('/products/:productId', shopController.getProduct)
 
-// router.get('/cart', shopController.getCartPage)
+router.get('/cart', shopController.getCartPage)
 
-// router.post('/cart', shopController.addToCart)
+router.post('/cart', shopController.addToCart)
 
 // router.post('/delete-cart-item', shopController.deleteCartItem)
 

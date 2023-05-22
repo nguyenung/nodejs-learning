@@ -5,17 +5,17 @@ block style
 
 block content
     h1 Your cart
-        if (cartData && cartData.Products.length)
+        if (cartData)
             .product-list
                 .grid
-                    each productItem in cartData.Products
+                    each cartItem in cartData.items
                         .card
-                            img(src=`${productItem.imageUrl}` alt="Image" style='width:100%')
-                            h6.product-title #{productItem.title}($#{productItem.price})
-                            p.price Quantity: #{productItem.CartItem.quantity}
+                            img(src=`${cartItem.product.imageUrl}` alt="Image" style='width:100%')
+                            h6.product-title #{cartItem.product.title}($#{cartItem.product.price})
+                            p.price Quantity: #{cartItem.quantity}
                             p
                                 form(action="/delete-cart-item" method="POST")
-                                    input(type="hidden", name="productId" value=productItem._id)
+                                    input(type="hidden", name="productId" value=cartItem.product._id)
                                     button(type="submit" class="button-red") Remove
             .order-form
                 h5 Total amount: $#{cartData.totalPrice}
