@@ -2,7 +2,7 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const errorController = require('./controllers/error')
 const mongoConnect = require('./utils/database').mongoConnect;
-// const { User } = require('./models')
+const User = require('./models/user')
 
 //Live reload when save file
 const livereload = require('livereload')
@@ -33,14 +33,15 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // 3. config folder static
 app.use(express.static('public'))
 
-/* app.use((req, res, next) => {
-    User.findByPk(1)
-    .then(user => {
-        req.user = user
-        next()
-    })
-    .catch(err => {console.log(err)})
-}) */
+app.use(async (req, res, next) => {
+    try {
+        const user = await User.findById("646ae19ecd7e8518b93d32ec")
+        req.user = new User(user.name, user.email, user.password, user._id, user.cart)
+    } catch (error) {
+        console.log(error)
+    }
+    next()
+})
 
 // 4. load route
 //app.use(an instance of express.Router())

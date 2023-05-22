@@ -3,11 +3,12 @@ const { ObjectId } = require('mongodb')
 const helpers = require('./../utils/helpers')
 
 class Product {
-    constructor(title, description, imageUrl, price) {
+    constructor(title, description, imageUrl, price, userId) {
         this.title = title
         this.description = description
         this.imageUrl = imageUrl
-        this.price = price
+        this.price = parseFloat(price)
+        this.userId = userId
     }
 
     async save() {
