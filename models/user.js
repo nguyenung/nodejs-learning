@@ -1,4 +1,58 @@
-const getDb = require('./../utils/database').getDb
+const mongoose = require('mongoose')
+
+const Schema = mongoose.Schema
+
+const userSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    cart: {
+        items: [{
+            productId: {
+                type: Schema.Types.ObjectId,
+                ref: 'Product'
+            },
+            quantity: {
+                type: Number,
+                default: 1
+            }
+        }],
+        totalPrice: {
+            type: Number,
+            default: 0
+        }
+    }
+})
+
+userSchema.methods.addToCart = async function(product) {
+    if(!this.cart) {
+        this.cart = {items: [], totalPrice: 0}
+    }
+    const existingPrdIndex = this.cart.items.findIndex(p => p.productId.equals(product._id))
+    const existingPrd = this.cart.items.find(p => p.productId.equals(product._id))
+    let updatedCart = this.cart
+    if (existingPrdIndex === -1) {
+        updatedCart.items.push({productId: product._id, quantity: 1})
+    } else {
+        updatedCart.items[existingPrdIndex].quantity += 1
+    }
+    updatedCart.totalPrice = updatedCart.totalPrice + product.price
+    this.cart = updatedCart
+    await this.save()
+}
+
+module.exports = mongoose.model('User', userSchema)
+
+/* const getDb = require('./../utils/database').getDb
 const mongodb = require('mongodb')
 const Order = require('./order');
 
@@ -148,4 +202,4 @@ class User {
     }
 }
 
-module.exports = User
+module.exports = User */

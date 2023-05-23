@@ -3,7 +3,7 @@ const Product = require('./../models/product');
 const helpers = require('./../utils/helpers');
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll()
+    Product.find()
         .then(products => {
             res.render('shop/product-list', {
                 path: '/products',
@@ -28,7 +28,7 @@ exports.getProduct = async (req, res, next) => {
 }
 
 exports.getIndexPage = (req, res, next) => {
-    Product.fetchAll()
+    Product.find()
         .then(products => {
             res.render('shop/index', {
                 path: '/',
@@ -41,11 +41,11 @@ exports.getIndexPage = (req, res, next) => {
 
 exports.getCartPage = async (req, res, next) => {
     try {
-        const cartData = await req.user.getCart()
+        const userWithCart = await req.user.populate('cart.items.productId')
         res.render('shop/cart', {
             path: '/cart',
             pageTitle: 'Cart',
-            cartData: cartData
+            cartData: userWithCart.cart
         })
     } catch (error) {
         helpers.errorHandle(error)
@@ -54,8 +54,7 @@ exports.getCartPage = async (req, res, next) => {
 
 exports.addToCart = async (req, res, next) => {
     try {
-        const productId = req.body.productId
-        const product = await Product.findById(productId)
+        const product = await Product.findById(req.body.productId)
         await req.user.addToCart(product)
         res.redirect('/cart')
     } catch (error) {

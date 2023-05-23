@@ -1,8 +1,13 @@
 const bodyParser = require('body-parser')
 const express = require('express')
 const errorController = require('./controllers/error')
-const mongoConnect = require('./utils/database').mongoConnect;
+const mongoose = require('mongoose')
 const User = require('./models/user')
+
+const dotenv = require('dotenv');
+dotenv.config()
+const environment = process.env.NODE_ENV || 'local'
+dotenv.config({ path: `.env.${environment}` })
 
 //Live reload when save file
 const livereload = require('livereload')
@@ -35,8 +40,20 @@ app.use(express.static('public'))
 
 app.use(async (req, res, next) => {
     try {
-        const user = await User.findById("646ae19ecd7e8518b93d32ec")
-        req.user = new User(user.name, user.email, user.password, user._id, user.cart)
+        let user = await User.findOne()
+        if (!user) {
+            user = new User({
+                name: 'Ung Nguyen',
+                email: 'ung.nguyen@example.com',
+                password: '1234',
+                cart: {
+                    items: [],
+                    totalPrice: 0
+                }
+            })
+            await user.save()
+        }
+        req.user = user
     } catch (error) {
         console.log(error)
     }
@@ -57,6 +74,11 @@ app.use(shopRouters.router)
 // 5. set 404 page
 app.use(errorController.pageNotFound)
 
-mongoConnect(() => {
+mongoose.connect(process.env.DB_MONGODB_CREDENTIAL)
+.then(result => {
+    console.log('Connected to MongoDB though mongoose')
     app.listen(3000)
+})
+.catch(err => {
+    console.log(err)
 })
