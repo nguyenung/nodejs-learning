@@ -10,12 +10,12 @@ block content
                 .grid
                     each cartItem in cartData.items
                         .card
-                            img(src=`${cartItem.product.imageUrl}` alt="Image" style='width:100%')
-                            h6.product-title #{cartItem.product.title}($#{cartItem.product.price})
+                            img(src=`${cartItem.productId.imageUrl}` alt="Image" style='width:100%')
+                            h6.product-title #{cartItem.productId.title}($#{cartItem.productId.price})
                             p.price Quantity: #{cartItem.quantity}
                             p
                                 form(action="/delete-cart-item" method="POST")
-                                    input(type="hidden", name="productId" value=cartItem.product._id)
+                                    input(type="hidden", name="productId" value=cartItem.productId._id)
                                     button(type="submit" class="button-red") Remove
             .order-form
                 h5 Total amount: $#{cartData.totalPrice}
