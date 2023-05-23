@@ -47,6 +47,9 @@ class User {
     }
 
     async getCart() {
+        if(!this.cart) {
+            this.cart = {items: [], totalPrice: 0}
+        }
         const cartItems = this.cart.items
         const productIds = cartItems.map(p => p.productId)
 
@@ -66,6 +69,24 @@ class User {
             items: items,
             totalPrice: this.cart.totalPrice
         }
+    }
+
+    async removeFromCart(product) {
+        if(!this.cart) {
+            this.cart = {items: [], totalPrice: 0}
+        }
+        const cart = this.cart
+        const existingPrdIndex = this.cart.items.findIndex(p => p.productId.equals(product._id))
+        const existingPrd = this.cart.items.find(p => p.productId.equals(product._id))
+        if (existingPrdIndex != -1) {
+            cart.totalPrice -= product.price * existingPrd.quantity
+            cart.items.splice(existingPrdIndex, 1)
+        }
+        const db = getDb()
+        await db.collection('users').updateOne(
+            {_id: this._id},
+            {$set: {cart: cart}}
+        )
     }
 }
 

@@ -66,21 +66,9 @@ exports.addToCart = async (req, res, next) => {
 exports.deleteCartItem = async (req, res, next) => {
     const productId = req.body.productId
     try {
-        let cart = await req.user.getCart()
-        if (!cart) {
-            res.redirect('/');
-        }
-        const cartProducts = await cart.getProducts({where: {id: productId}})
-        if (cartProducts.length === 0) {
-            throw new Error('Product invalid.')
-        }
-        const product = cartProducts[0]
-        const cartItem = product.CartItem
-        const newTotalPrice = cart.totalPrice - product.price * cartItem.quantity
-        await cartItem.destroy()
-        cart.totalPrice = newTotalPrice
-        await cart.save()
-         res.redirect('/cart');
+        const product = await Product.findById(productId)
+        await req.user.removeFromCart(product)
+        res.redirect('/cart');
     } catch (err) {
         helpers.errorHandle(err)
     }
