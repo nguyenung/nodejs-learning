@@ -1,4 +1,19 @@
 extends ../layout/main.pug
 
+block style 
+    link(rel="stylesheet", href="/css/order.css")
+
 block content
     h1 Your orders
+        if (orders.length > 0)
+            .orders-wrapper
+                ul
+                    each orderItem in orders
+                        li.order-item
+                            p.order-id Order ID: #{orderItem._id.toString()}
+                            p.order-price Total Price: $#{orderItem.totalPrice}
+                            each productItem in orderItem.items
+                                p.order-product-item - #{productItem.product.title} - Quantity: #{productItem.quantity}
+
+        else
+            p Nothing here

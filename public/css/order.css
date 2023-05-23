@@ -1,0 +1,15 @@
+.orders-wrapper p {
+    font-size: 16px;
+    color: gray;
+}
+
+.orders-wrapper .order-item {
+    margin-bottom: 20px;
+    display: block;
+    border-bottom: 1px solid rgb(216, 216, 216);
+}
+
+.order-product-item {
+    font-style: italic;
+    padding-left: 20px;
+}
