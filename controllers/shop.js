@@ -75,39 +75,20 @@ exports.deleteCartItem = async (req, res, next) => {
 }
 
 exports.createOrder = async (req, res, next) => {
-    try {
-        const cart = await req.user.getCart()
-        if (!cart) {
-            res.redirect('/')
-        }
-
-        await sequelize.transaction(async (transaction) => {
-            try {
-                const order = await req.user.createOrder({
-                    totalPrice: cart.totalPrice
-                }, {transaction: transaction})
-                const cartProducts = await cart.getProducts()
-                await order.addProducts(cartProducts.map(product => {
-                    product.OrderItem = {quantity: product.CartItem.quantity}
-                    return product
-                }), {transaction: transaction})
-                transaction.commit()
-            } catch(err) {
-                transaction.rollback()
-                helpers.errorHandle(err)
-            }
-        });
-
-        res.redirect('/orders');
-    } catch(err) {
-        helpers.errorHandle(err)
+    const cart = req.user.cart
+    if (!cart) {
+        res.redirect('/')
     }
+    await req.user.createOrder()
+    res.redirect('/orders')
 }
 
-exports.getOrdersPage = (req, res, next) => {
+exports.getOrdersPage = async (req, res, next) => {
+    const orders = await req.user.getOrders()
     res.render('shop/orders', {
         path: '/orders',
-        pageTitle: 'Your orders'
+        pageTitle: 'Your orders',
+        orders: orders
     })
 }
 

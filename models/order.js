@@ -1,20 +1,18 @@
-'use strict';
-const {
-    Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-    class Order extends Model {
-        static associate(models) {
-            Order.belongsTo(models.User, { foreignKey: 'userId' })
-            Order.belongsToMany(models.Product, { through: models.OrderItem })
-        }
+const getDb = require('./../utils/database').getDb
+
+class Order {
+    constructor(userId, items, totalPrice, id) {
+        this.userId = userId
+        this.items = items
+        this.totalPrice = totalPrice
+        this._id = id
     }
-    Order.init({
-        userId: DataTypes.INTEGER,
-        totalPrice: DataTypes.FLOAT
-    }, {
-        sequelize,
-        modelName: 'Order',
-    });
-    return Order;
-};
+
+    async save() {
+        const db = getDb()
+        await db.collection('orders')
+        .insertOne(this)
+    }
+}
+
+module.exports = Order
