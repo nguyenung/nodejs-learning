@@ -13,7 +13,7 @@ block content
                             p.order-id Order ID: #{orderItem._id.toString()}
                             p.order-price Total Price: $#{orderItem.totalPrice}
                             each productItem in orderItem.items
-                                p.order-product-item - #{productItem.product.title} - Quantity: #{productItem.quantity}
+                                p.order-product-item - #{productItem.productId.title} - Quantity: #{productItem.quantity}
 
         else
             p Nothing here

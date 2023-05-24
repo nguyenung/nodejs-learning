@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Order = require('./order');
 
 const Schema = mongoose.Schema
 
@@ -33,20 +34,57 @@ const userSchema = new Schema({
     }
 })
 
-userSchema.methods.addToCart = async function(product) {
-    if(!this.cart) {
-        this.cart = {items: [], totalPrice: 0}
+userSchema.methods.addToCart = async function (product) {
+    if (!this.cart) {
+        this.cart = { items: [], totalPrice: 0 }
     }
     const existingPrdIndex = this.cart.items.findIndex(p => p.productId.equals(product._id))
-    const existingPrd = this.cart.items.find(p => p.productId.equals(product._id))
     let updatedCart = this.cart
     if (existingPrdIndex === -1) {
-        updatedCart.items.push({productId: product._id, quantity: 1})
+        updatedCart.items.push({ productId: product._id, quantity: 1 })
     } else {
         updatedCart.items[existingPrdIndex].quantity += 1
     }
     updatedCart.totalPrice = updatedCart.totalPrice + product.price
     this.cart = updatedCart
+    await this.save()
+}
+
+userSchema.methods.removeFromCart = async function (product) {
+    if (!this.cart) {
+        this.cart = { items: [], totalPrice: 0 }
+    }
+
+    const updatedCart = this.cart
+    const existingPrdIndex = this.cart.items.findIndex(p => p.productId.equals(product._id))
+    const existingPrd = this.cart.items.find(p => p.productId.equals(product._id))
+
+    if (existingPrdIndex != -1) {
+        updatedCart.totalPrice -= product.price * existingPrd.quantity
+        updatedCart.items.splice(existingPrdIndex, 1)
+    }
+    this.cart = updatedCart
+    await this.save()
+}
+
+userSchema.methods.getOrders = async function () {
+    try {
+        const orders = await Order.find({ userId: this._id }).populate('items.productId');
+        return orders;
+    } catch (error) {
+        console.error('Error retrieving user orders:', error);
+        throw error;
+    }
+}
+
+userSchema.methods.createOrder = async function () {
+    const newOrder = new Order({
+        userId: this,
+        items: this.cart.items,
+        totalPrice: this.cart.totalPrice
+    })
+    await newOrder.save()
+    this.cart = { items: [], totalPrice: 0 }
     await this.save()
 }
 
