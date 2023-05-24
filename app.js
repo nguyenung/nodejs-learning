@@ -3,6 +3,7 @@ const express = require('express')
 const errorController = require('./controllers/error')
 const mongoose = require('mongoose')
 const User = require('./models/user')
+const session = require('express-session')
 
 const dotenv = require('dotenv');
 dotenv.config()
@@ -38,6 +39,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // 3. config folder static
 app.use(express.static('public'))
 
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
+
 app.use(async (req, res, next) => {
     try {
         let user = await User.findOne()
@@ -66,9 +73,11 @@ app.use(async (req, res, next) => {
 
 const shopRouters = require('./route/shop')
 const adminRouters = require('./route/admin')
+const authRouters = require('./route/auth')
 
 app.use('/admin', adminRouters.router)
 app.use(shopRouters.router)
+app.use(authRouters.router)
 
 
 // 5. set 404 page

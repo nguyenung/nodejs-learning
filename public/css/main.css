@@ -16,6 +16,9 @@ li {
     list-style: none;
     display: inline;
 }
+nav ul li.auth-item {
+    float: right;
+}
 nav ul li a {
     padding: 5px 10px;
 }
