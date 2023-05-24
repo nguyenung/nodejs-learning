@@ -5,7 +5,7 @@ block style
 
 block content
     h1 Your cart
-        if (cartData.items.length > 0)
+        if (cartData.items && cartData.items.length > 0)
             .product-list
                 .grid
                     each cartItem in cartData.items

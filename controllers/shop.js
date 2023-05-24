@@ -42,6 +42,7 @@ exports.getIndexPage = (req, res, next) => {
 exports.getCartPage = async (req, res, next) => {
     try {
         const userWithCart = await req.user.populate('cart.items.productId')
+        console.log(userWithCart.cart)
         res.render('shop/cart', {
             path: '/cart',
             pageTitle: 'Cart',
@@ -66,7 +67,9 @@ exports.deleteCartItem = async (req, res, next) => {
     const productId = req.body.productId
     try {
         const product = await Product.findById(productId)
-        await req.user.removeFromCart(product)
+        if (product) {
+            await req.user.removeFromCart(product)
+        }
         res.redirect('/cart');
     } catch (err) {
         helpers.errorHandle(err)
