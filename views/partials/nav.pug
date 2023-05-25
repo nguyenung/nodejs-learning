@@ -4,14 +4,19 @@ nav
             a(href="/" class=(path === '/' ? 'active' : '')) Shop
         li
             a(href="/products" class=(path === '/products' ? 'active' : '')) Products
-        li
-            a(href="/cart" class=(path === '/cart' ? 'active' : '')) Cart
-        li
-            a(href="/orders" class=(path === '/orders' ? 'active' : '')) Orders
+
         if (isLoggedIn)
+            li
+                a(href="/cart" class=(path === '/cart' ? 'active' : '')) Cart
+            li
+                a(href="/orders" class=(path === '/orders' ? 'active' : '')) Orders
             li
                 a(href="/admin/add-product" class=(path === '/admin/add-product' ? 'active' : '')) Add product
             li
                 a(href="/admin/products" class=(path === '/admin/products' ? 'active' : '')) Admin product
-        li.auth-item
-            a(href="/login" class=(path === '/login' ? 'active' : '')) Login
+            li.auth-item
+                form(action="/logout", method="post") 
+                    button(type="submit") Logout
+        else
+            li.auth-item
+                a(href="/login" class=(path === '/login' ? 'active' : '')) Login
