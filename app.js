@@ -4,6 +4,7 @@ const errorController = require('./controllers/error')
 const mongoose = require('mongoose')
 const User = require('./models/user')
 const session = require('express-session')
+const MongoDBStore = require('connect-mongodb-session')(session)
 
 const dotenv = require('dotenv');
 dotenv.config()
@@ -39,32 +40,35 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // 3. config folder static
 app.use(express.static('public'))
 
+const store = new MongoDBStore({
+    uri: process.env.DB_MONGODB_CREDENTIAL,
+    collection: 'sessions'
+})
+
+store.on('error', (error) => {
+    console.error('MongoDBStore Error:', error);
+});
+
 app.use(session({
     secret: process.env.SESSION_SECRET,
+    store: store,
     resave: false,
     saveUninitialized: false
 }))
 
 app.use(async (req, res, next) => {
     try {
-        let user = await User.findOne()
-        if (!user) {
-            user = new User({
-                name: 'Ung Nguyen',
-                email: 'ung.nguyen@example.com',
-                password: '1234',
-                cart: {
-                    items: [],
-                    totalPrice: 0
-                }
-            })
-            await user.save()
+        if (!req.session.user) {
+            return next()
         }
-        req.user = user
+        const user = await User.findById(req.session.user._id)
+        if (user) {
+            req.user = user
+            next()
+        }
     } catch (error) {
         console.log(error)
     }
-    next()
 })
 
 // 4. load route

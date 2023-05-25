@@ -1,3 +1,4 @@
+const User = require('./../models/user');
 
 exports.loginPage = (req, res, next) => {
     // console.log(req.get('Cookie').split(';')[1].trim().split('=')[1])
@@ -9,12 +10,23 @@ exports.loginPage = (req, res, next) => {
 }
 
 exports.login = (req, res, next) => {
-    req.session.isLoggedIn = true
-    // res.setHeader('Set-Cookie', 'isLoggedIn=true')
-    res.redirect('/')
+    User.findById('646cc0f246e948b485c28b22')
+    .then(user => {
+        req.session.isLoggedIn = true
+        req.session.user = user
+        req.session.save((err) => {
+            res.redirect('/')
+        })
+    })
+    .catch(err => console.log(err))
 }
 
 exports.logout = (req, res, next) => {
-    // res.setHeader('Set-Cookie', 'isLoggedIn=false')
-    res.redirect('/')
+    if (req.session.isLoggedIn) {
+        req.session.destroy(() => {
+            res.redirect('/')
+        })
+    } else {
+        throw new Error('You must log in first.')
+    }
 }

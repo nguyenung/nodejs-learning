@@ -5,4 +5,5 @@
     p #{product.description}
     p
         a(href=`/products/${product._id}` class="button button-white") Detail
-        include _add-to-cart.pug
+        if (isLoggedIn)
+            include _add-to-cart.pug
