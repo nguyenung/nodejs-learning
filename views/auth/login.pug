@@ -1,0 +1,16 @@
+extend ./../layout/main.pug
+
+block style
+    link(rel="stylesheet", href="css/form.css")
+
+block content
+    h1 Login page
+    .form-wrapper
+        form(action="/login", method="post") 
+            label(for='email') Email
+            input(type="email", name="email" id="email")
+
+            label(for='password') Password
+            input(type="password", name="password" id="password")
+
+            button(type='submit' value="Login") Login

@@ -10,7 +10,8 @@ exports.getProducts = (req, res, next) => {
         res.render('admin/products', {
             path: "/admin/products",
             products: products,
-            pageTitle: "Admin - All product"
+            pageTitle: "Admin - All product",
+            isLoggedIn: req.session.isLoggedIn,
         })
     })
     .catch(err => {
@@ -21,7 +22,8 @@ exports.getProducts = (req, res, next) => {
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         path: "/admin/add-product",
-        pageTitle: "Add product"
+        pageTitle: "Add product",
+        isLoggedIn: req.session.isLoggedIn,
     })
 }
 
@@ -51,6 +53,7 @@ exports.getEditProduct = async (req, res, next) => {
             pageTitle: "Edit product",
             editMode: true,
             product: product,
+            isLoggedIn: req.session.isLoggedIn,
         })
     } catch(err) {
         helpers.errorHandle(err)
