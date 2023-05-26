@@ -17,6 +17,10 @@ nav
             li.auth-item
                 form(action="/logout", method="post") 
                     button(type="submit") Logout
+            li.auth-item
+                span Hello, #{user.name} | 
         else
             li.auth-item
                 a(href="/login" class=(path === '/login' ? 'active' : '')) Login
+            li.auth-item
+                a(href="/signup" class=(path === '/signup' ? 'active' : '')) Signup

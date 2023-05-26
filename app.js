@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const User = require('./models/user')
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
+const flash = require('connect-flash')
 
 const dotenv = require('dotenv');
 dotenv.config()
@@ -55,15 +56,18 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }))
+app.use(flash())
 
 app.use(async (req, res, next) => {
     try {
         if (!req.session.user) {
+            res.locals.user = req.session.user;
             return next()
         }
         const user = await User.findById(req.session.user._id)
         if (user) {
             req.user = user
+            res.locals.user = user;
             next()
         }
     } catch (error) {
