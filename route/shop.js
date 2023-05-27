@@ -1,7 +1,7 @@
 const express = require('express')
-const shopController = require('./../controllers/shop');
-
 const router = express.Router()
+const requireAuth = require('./middle-wares/require-auth')
+const shopController = require('./../controllers/shop')
 
 router.get('/', shopController.getIndexPage)
 
@@ -9,15 +9,15 @@ router.get('/products', shopController.getProducts)
 
 router.get('/products/:productId', shopController.getProduct)
 
-router.get('/cart', shopController.getCartPage)
+router.get('/cart', requireAuth, shopController.getCartPage)
 
-router.post('/cart', shopController.addToCart)
+router.post('/cart', requireAuth, shopController.addToCart)
 
-router.post('/delete-cart-item', shopController.deleteCartItem)
+router.post('/delete-cart-item', requireAuth, shopController.deleteCartItem)
 
-router.get('/orders', shopController.getOrdersPage)
+router.get('/orders', requireAuth, shopController.getOrdersPage)
 
-router.post('/create-order', shopController.createOrder)
+router.post('/create-order', requireAuth, shopController.createOrder)
 
 // router.get('/checkout', shopController.getCheckoutPage)
 
