@@ -5,8 +5,6 @@ block style
 
 block content
     h1 Create new account
-    if (errorMessage)
-        .error-message #{errorMessage}
     .form-wrapper
         form(action="/signup", method="post")
             label(for='name') Name

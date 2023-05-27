@@ -10,5 +10,7 @@ html(lang="en")
     body 
         include ../partials/nav
 
-        main 
+        main
+            if (messages.error)
+                .mt-20.error-message #{messages.error}
             block content

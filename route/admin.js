@@ -1,19 +1,18 @@
 const express = require('express')
-
 const router = express.Router()
-
 const adminController = require('./../controllers/admin')
+const requireAuth = require('./middle-wares/require-auth')
 
-router.get('/products', adminController.getProducts)
+router.get('/products', requireAuth, adminController.getProducts)
 
-router.get('/add-product', adminController.getAddProduct)
+router.get('/add-product', requireAuth, adminController.getAddProduct)
 
-router.post('/add-product', adminController.postAddProduct)
+router.post('/add-product', requireAuth, adminController.postAddProduct)
 
-router.get('/edit-product/:productId', adminController.getEditProduct)
+router.get('/edit-product/:productId', requireAuth, adminController.getEditProduct)
 
-router.post('/edit-product', adminController.doEditProduct)
+router.post('/edit-product', requireAuth, adminController.doEditProduct)
 
-router.post('/delete-product', adminController.doDeleteProduct)
+router.post('/delete-product', requireAuth, adminController.doDeleteProduct)
 
 exports.router = router
