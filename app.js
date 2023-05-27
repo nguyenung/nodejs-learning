@@ -57,6 +57,10 @@ app.use(session({
     saveUninitialized: false
 }))
 app.use(flash())
+app.use((req, res, next) => {
+    res.locals.messages = req.flash()
+    next();
+});
 
 app.use(async (req, res, next) => {
     try {
