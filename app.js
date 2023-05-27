@@ -2,6 +2,7 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const errorController = require('./controllers/error')
 const mongoose = require('mongoose')
+const helpers = require('./utils/helpers')
 const User = require('./models/user')
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
@@ -58,7 +59,15 @@ app.use(session({
 }))
 app.use(flash())
 app.use((req, res, next) => {
-    res.locals.messages = req.flash()
+    let flashMessages = req.flash()
+    if (flashMessages) {
+        if (flashMessages.error &&  helpers.isValidJSON(flashMessages.error)) {
+            flashMessages.error = JSON.parse(flashMessages.error)
+        } else {
+            flashMessages.error = [flashMessages.error]
+        }
+        res.locals.messages = flashMessages
+    }
     next();
 });
 

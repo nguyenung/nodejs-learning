@@ -11,6 +11,5 @@ html(lang="en")
         include ../partials/nav
 
         main
-            if (messages.error)
-                .mt-20.error-message #{messages.error}
+            include ../partials/flash-errors
             block content

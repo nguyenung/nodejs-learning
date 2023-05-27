@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const requireAuth = require('./middle-wares/require-auth')
+const requireAuth = require('../middlewares/require-auth')
 const shopController = require('./../controllers/shop')
 
 router.get('/', shopController.getIndexPage)

@@ -14,30 +14,9 @@ exports.signupPage = (req, res, next) => {
     })
 }
 
-const validateSignup = async (name, email, password, confirm_password) => {
-    let invalid
-    let errorMessage
-    const user = await User.findOne({ email: email })
-    if (!name || !email || !password || !confirm_password) {
-        invalid = true
-        errorMessage = 'Email, password and confirm password is required.'
-    } else if (user) {
-        invalid = true
-        errorMessage = 'Email has already been registered.'
-    } else if(password!== confirm_password) {
-        errorMessage = 'Passwords do not match.'
-        invalid = true
-    }
-    return { invalid, errorMessage }
-}
 exports.signup = async (req, res, next) => {
     try {
-        const {name, email, password, confirm_password} = req.body
-        const validate = await validateSignup(name, email, password, confirm_password)
-        if (validate.invalid) {
-            req.flash('error', validate.errorMessage)
-            return res.redirect('/signup')
-        }
+        const {name, email, password} = req.body
         // Generate a salt with a specified number of rounds (10 is a common value)
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds)
@@ -70,16 +49,31 @@ exports.loginPage = (req, res, next) => {
     })
 }
 
-exports.login = (req, res, next) => {
-    User.findById('646cc0f246e948b485c28b22')
-    .then(user => {
-        req.session.isLoggedIn = true
-        req.session.user = user
-        req.session.save((err) => {
-            res.redirect('/')
+exports.login = async (req, res, next) => {
+    const { email, password } = req.body
+    try {
+        const user = await User.findOne({ email: email})
+        // Load hash from your password DB.
+        bcrypt.compare(password, user.password, function(err, isMatch) {
+            if (err) {
+                // Handle error
+                console.error('Error comparing passwords:', err)
+                req.flash('error', 'Error comparing passwords')
+                return res.redirect('/login')
+            }
+            
+            if (isMatch) {
+                req.session.isLoggedIn = true
+                req.session.user = user
+                return res.redirect('/')
+            } else {
+                req.flash('error', 'Password is incorrect')
+                return res.redirect('/login')
+            }
         })
-    })
-    .catch(err => console.log(err))
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 exports.logout = (req, res, next) => {
