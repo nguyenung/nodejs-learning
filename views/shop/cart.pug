@@ -15,11 +15,13 @@ block content
                             p.price Quantity: #{cartItem.quantity}
                             p
                                 form(action="/delete-cart-item" method="POST")
+                                    input(type="hidden", name="_csrf", value=csrfToken)
                                     input(type="hidden", name="productId" value=cartItem.productId._id)
                                     button(type="submit" class="button-red") Remove
             .order-form
                 h5 Total amount: $#{cartData.totalPrice}
                 form(action="/create-order", method="post")
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     button(type="submit" class="button button-blue") Order now!
         else
             p Nothing here
