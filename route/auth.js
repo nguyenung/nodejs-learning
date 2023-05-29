@@ -8,7 +8,7 @@ const loginValidatorRules = require('./../validators/login-validators')
 
 router.get('/login', authController.loginPage)
 
-router.post('/login', validate(loginValidatorRules), authController.login)
+router.post('/login', [], authController.login)
 
 router.post('/logout', requireAuth, authController.logout)
 

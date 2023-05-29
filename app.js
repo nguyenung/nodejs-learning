@@ -7,6 +7,7 @@ const User = require('./models/user')
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
 const flash = require('connect-flash')
+const csrf = require('csurf')
 
 const dotenv = require('dotenv');
 dotenv.config()
@@ -46,10 +47,9 @@ const store = new MongoDBStore({
     uri: process.env.DB_MONGODB_CREDENTIAL,
     collection: 'sessions'
 })
-
 store.on('error', (error) => {
-    console.error('MongoDBStore Error:', error);
-});
+    console.error('MongoDBStore Error:', error)
+})
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -57,19 +57,35 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }))
+
 app.use(flash())
 app.use((req, res, next) => {
     let flashMessages = req.flash()
     if (flashMessages) {
-        if (flashMessages.error &&  helpers.isValidJSON(flashMessages.error)) {
+        if (flashMessages.error && helpers.isValidJSON(flashMessages.error)) {
             flashMessages.error = JSON.parse(flashMessages.error)
         } else {
             flashMessages.error = [flashMessages.error]
         }
         res.locals.messages = flashMessages
     }
-    next();
-});
+    next()
+})
+
+app.use(csrf())
+app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken()
+    next()
+})
+
+// error handler
+app.use(function (err, req, res, next) {
+    if (err.code !== 'EBADCSRFTOKEN') return next(err)
+
+    // handle CSRF token errors here
+    res.status(403)
+    res.send('CSRF token is missing')
+})
 
 app.use(async (req, res, next) => {
     try {
@@ -105,10 +121,10 @@ app.use(authRouters.router)
 app.use(errorController.pageNotFound)
 
 mongoose.connect(process.env.DB_MONGODB_CREDENTIAL)
-.then(result => {
-    console.log('Connected to MongoDB though mongoose')
-    app.listen(3000)
-})
-.catch(err => {
-    console.log(err)
-})
+    .then(result => {
+        console.log('Connected to MongoDB though mongoose')
+        app.listen(3000)
+    })
+    .catch(err => {
+        console.log(err)
+    })
