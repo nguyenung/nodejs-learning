@@ -1,5 +1,20 @@
 const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
 const User = require('./../models/user')
+
+const dotenv = require('dotenv');
+dotenv.config()
+const environment = process.env.NODE_ENV || 'local'
+dotenv.config({ path: `.env.${environment}` })
+
+const transporter = nodemailer.createTransport({
+    host: 'smtp.sendgrid.net',
+    port: 587,
+    auth: {
+        user: process.env.SENDGRID_USER,
+        pass: process.env.SENDGRID_API_KEY
+    }
+})
 
 exports.signupPage = (req, res, next) => {
     // Get flash messages from the session
@@ -16,7 +31,7 @@ exports.signupPage = (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
     try {
-        const {name, email, password} = req.body
+        const { name, email, password } = req.body
         // Generate a salt with a specified number of rounds (10 is a common value)
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds)
@@ -33,8 +48,19 @@ exports.signup = async (req, res, next) => {
         await newUser.save()
         req.session.isLoggedIn = true
         req.session.user = newUser
-        req.session.save((err) => {
-            res.redirect('/')
+        await req.session.save()
+        transporter.sendMail({
+            from: process.env.SENDGRID_SENDER_EMAIL, // verified sender email
+            to: email, // recipient email
+            subject: "Welcome to Node.js online shop", // Subject line
+            text: "Welcome to Node.js online shop!", // plain text body
+            html: "<b>Welcome to Node.js online shop!</b>", // html body
+        }, function (error, info) {
+            if (!error) {
+                res.redirect('/')
+            } else {
+                throw new Error(error)
+            }
         })
     } catch (error) {
         console.error(error)
@@ -52,16 +78,16 @@ exports.loginPage = (req, res, next) => {
 exports.login = async (req, res, next) => {
     const { email, password } = req.body
     try {
-        const user = await User.findOne({ email: email})
+        const user = await User.findOne({ email: email })
         // Load hash from your password DB.
-        bcrypt.compare(password, user.password, function(err, isMatch) {
+        bcrypt.compare(password, user.password, function (err, isMatch) {
             if (err) {
                 // Handle error
                 console.error('Error comparing passwords:', err)
                 req.flash('error', 'Error comparing passwords')
                 return res.redirect('/login')
             }
-            
+
             if (isMatch) {
                 req.session.isLoggedIn = true
                 req.session.user = user
