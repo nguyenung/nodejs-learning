@@ -8,8 +8,9 @@ const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
 const flash = require('connect-flash')
 const csrf = require('csurf')
+const baseUrl = require('./middlewares/baseUrl')
 
-const dotenv = require('dotenv');
+const dotenv = require('dotenv')
 dotenv.config()
 const environment = process.env.NODE_ENV || 'local'
 dotenv.config({ path: `.env.${environment}` })
@@ -17,7 +18,7 @@ dotenv.config({ path: `.env.${environment}` })
 //Live reload when save file
 const livereload = require('livereload')
 const connectLiveReload = require('connect-livereload')
-const liveReloadServer = livereload.createServer();
+const liveReloadServer = livereload.createServer()
 liveReloadServer.server.once("connection", () => {
     setTimeout(() => {
         liveReloadServer.refresh("/");
@@ -27,6 +28,8 @@ liveReloadServer.server.once("connection", () => {
 const app = express()
 
 app.use(connectLiveReload())
+
+app.use(baseUrl)
 
 // 1. set template engine and views folder
 app.set('view engine', 'pug')

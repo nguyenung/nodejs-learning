@@ -16,4 +16,10 @@ router.get('/signup', authController.signupPage)
 
 router.post('/signup', validate(signupValidatorRules), authController.signup)
 
+router.get('/forgot-password', authController.forgotPasswordPage)
+
+router.get('/reset-password', authController.resetPasswordPage)
+
+router.post('/reset-password', authController.resetPassword)
+
 exports.router = router
