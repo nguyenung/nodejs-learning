@@ -1,0 +1,7 @@
+if (messages.error)
+    each errorMsg in messages.error
+        .mt-20.error-message #{errorMsg}
+
+if (messages.success)
+    each successMsg in messages.success
+        .mt-20.success-message #{successMsg}

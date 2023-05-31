@@ -1,4 +1,3 @@
-// const { Product } = require('./../models');
 const Product = require('./../models/product')
 const helpers = require('./../utils/helpers')
 
@@ -73,7 +72,7 @@ exports.doEditProduct = async (req, res, next) => {
         const updatedProduct = await Product.findByIdAndUpdate(productId, updatedFields)
         res.redirect('/admin/products')
     } catch(err) {
-        console.error('Error updating record:', err);
+        console.error('Error updating record:', err)
     }
 }
 

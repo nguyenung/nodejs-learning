@@ -1,6 +1,6 @@
-const Product = require('./../models/product');
+const Product = require('./../models/product')
 
-const helpers = require('./../utils/helpers');
+const helpers = require('./../utils/helpers')
 
 exports.getProducts = (req, res, next) => {
     Product.find()
@@ -17,7 +17,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = async (req, res, next) => {
     try {
-        const product = await Product.findById(req.params.productId);
+        const product = await Product.findById(req.params.productId)
         res.render('shop/product-detail', {
             product: product,
             pageTitle: product.title,
@@ -72,7 +72,7 @@ exports.deleteCartItem = async (req, res, next) => {
         if (product) {
             await req.user.removeFromCart(product)
         }
-        res.redirect('/cart');
+        res.redirect('/cart')
     } catch (err) {
         helpers.errorHandle(err)
     }
