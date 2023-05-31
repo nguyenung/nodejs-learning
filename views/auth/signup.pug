@@ -6,7 +6,7 @@ block style
 block content
     h1 Create new account
     .form-wrapper
-        form(action="/signup", method="post")
+        form(action="/signup", method="post" class="form-data")
             input(type="hidden", name="_csrf", value=csrfToken)
 
             label(for='name') Name

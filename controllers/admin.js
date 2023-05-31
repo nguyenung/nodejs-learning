@@ -2,7 +2,7 @@ const Product = require('./../models/product')
 const helpers = require('./../utils/helpers')
 
 exports.getProducts = (req, res, next) => {
-    Product.find()
+    Product.find({userId: req.user.id})
     // .select('title price -_id')
     // .populate('userId')
     .then(products => {
@@ -43,13 +43,16 @@ exports.postAddProduct = async (req, res, next) => {
 exports.getEditProduct = async (req, res, next) => {
     const productId = req.params.productId
     try {
-        const product = await Product.findById(productId)
+        const product = await Product.findOne({
+            _id: productId,
+            userId: req.user._id
+        })
         if (!product) {
             throw new Error('Product not found.')
         }
         res.render('admin/edit-product', {
-            path: "/admin/edit-product",
-            pageTitle: "Edit product",
+            path: '/admin/edit-product',
+            pageTitle: 'Edit product',
             editMode: true,
             product: product,
             isLoggedIn: req.session.isLoggedIn,
