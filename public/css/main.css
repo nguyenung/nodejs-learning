@@ -39,6 +39,10 @@ nav ul li a.active {
     color: #c72b2b;
 }
 
+.success-message {
+    color: rgb(12, 161, 12);
+}
+
 .mt-20 {
     margin-top: 20px;
 }

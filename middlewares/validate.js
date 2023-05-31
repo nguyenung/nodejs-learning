@@ -11,7 +11,7 @@ const validate = (validationRules) => {
         const errorMsgs = errors.array().map(error => error.msg)
         const strError = JSON.stringify(errorMsgs)
         req.flash('error', strError)
-        return res.redirect(req.originalUrl);
+        return res.redirect('back')
     }
 }
 

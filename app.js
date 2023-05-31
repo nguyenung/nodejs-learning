@@ -1,5 +1,6 @@
 const bodyParser = require('body-parser')
 const express = require('express')
+// require('express-async-errors')
 const errorController = require('./controllers/error')
 const mongoose = require('mongoose')
 const helpers = require('./utils/helpers')
@@ -9,6 +10,8 @@ const MongoDBStore = require('connect-mongodb-session')(session)
 const flash = require('connect-flash')
 const csrf = require('csurf')
 const baseUrl = require('./middlewares/baseUrl')
+const methodOverride = require('method-override')
+
 
 const dotenv = require('dotenv')
 dotenv.config()
@@ -21,9 +24,9 @@ const connectLiveReload = require('connect-livereload')
 const liveReloadServer = livereload.createServer()
 liveReloadServer.server.once("connection", () => {
     setTimeout(() => {
-        liveReloadServer.refresh("/");
-    }, 100);
-});
+        liveReloadServer.refresh("/")
+    }, 100)
+})
 
 const app = express()
 
@@ -93,13 +96,13 @@ app.use(function (err, req, res, next) {
 app.use(async (req, res, next) => {
     try {
         if (!req.session.user) {
-            res.locals.user = req.session.user;
+            res.locals.user = req.session.user
             return next()
         }
         const user = await User.findById(req.session.user._id)
         if (user) {
             req.user = user
-            res.locals.user = user;
+            res.locals.user = user
             next()
         }
     } catch (error) {
@@ -110,7 +113,6 @@ app.use(async (req, res, next) => {
 // 4. load route
 //app.use(an instance of express.Router())
 
-
 const shopRouters = require('./route/shop')
 const adminRouters = require('./route/admin')
 const authRouters = require('./route/auth')
@@ -119,6 +121,11 @@ app.use('/admin', adminRouters.router)
 app.use(shopRouters.router)
 app.use(authRouters.router)
 
+app.use(methodOverride())
+app.use((err, req, res, next) => {
+    res.status(err.statusCode || 500)
+    res.render('error', { error: err.message })
+})
 
 // 5. set 404 page
 app.use(errorController.pageNotFound)

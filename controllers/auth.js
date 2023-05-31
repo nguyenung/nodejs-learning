@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt')
 const sendEmail = require('./../utils/email-sender')
 const User = require('./../models/user')
+const PasswordReset = require('./../models/password-reset')
 const crypto = require('crypto')
 
 exports.signupPage = (req, res, next) => {
@@ -88,8 +89,58 @@ exports.forgotPasswordPage = (req, res, next) => {
     })
 }
 
-exports.resetPasswordPage = (req, res, next) => {
-    console.log('Logic check token and change password')
+exports.newPasswordPage = async (req, res, next) => {
+    try {
+        const token = req.query.token
+        const passwordReset = await PasswordReset.findOne({token})
+        if (!passwordReset) {
+            const error = new Error('Invalid token or Password reset link has expired.')
+            error.statusCode = 403
+            next(error)
+        } else {
+            const now = Date.now()
+            if (passwordReset.expiresAt < now) {
+                const error = new Error('Invalid token or Password reset link has expired.')
+                error.statusCode = 403
+                next(error)
+            } else {
+                res.render('auth/new-password', {
+                    pageTitle: 'Reset Password',
+                    path: '/new-password',
+                    passwordReset,
+                })
+            }
+        }
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+exports.createNewPassword = async (req, res, next) => {
+    const {id, token, password} = req.body
+    const passwordReset = await PasswordReset.findOne({_id: id, token})
+    if (!passwordReset) {
+        const error = new Error('Invalid token or Password reset link has expired.')
+        error.statusCode = 403
+        next(error)
+    } else {
+        const now = Date.now()
+        if (passwordReset.expiresAt < now) {
+            const error = new Error('Invalid token or Password reset link has expired.')
+            error.statusCode = 403
+            next(error)
+        } else {
+            const user = await User.findOne({email: passwordReset.email})
+            const saltRounds = 10
+            const salt = await bcrypt.genSalt(saltRounds)
+            const hashPassword = await bcrypt.hash(password, salt)
+            user.password = hashPassword
+            await user.save()
+            await PasswordReset.findByIdAndRemove(id)
+            req.flash('success', 'Password has been reset successful')
+            return res.redirect('/login')
+        }
+    }
 }
 
 exports.resetPassword = async (req, res, next) => {
@@ -99,14 +150,19 @@ exports.resetPassword = async (req, res, next) => {
         req.flash('error', 'No account with that email address exists.')
         return res.redirect('/forgot-password')
     } else {
-        crypto.randomBytes(32, (err, buf) => {
+        crypto.randomBytes(32, async (err, buf) => {
             if (err) {
                 console.error(err)
                 return res.redirect('/forgot-password')
             }
             const token = buf.toString('hex')
-            const resetPasswordLink = `${res.locals.baseUrl}/reset-password?token=${token}`
-            console.log(resetPasswordLink)
+            
+            const expiresAt = Date.now() + 3600 * 1000
+            const passwordReset = new PasswordReset({ email, token, expiresAt })
+            await passwordReset.save()
+
+            req.flash('success', 'Request reset password successful. Please check your email to continue.')
+            const resetPasswordLink = `${res.locals.baseUrl}/new-password?token=${token}`
             sendEmail(
                 email,
                 'Reset Password',
@@ -114,9 +170,8 @@ exports.resetPassword = async (req, res, next) => {
                 {resetPasswordLink},
                 () => {res.redirect('/forgot-password')}
             )
-            return res.redirect('/forgot-password')
+            return res.redirect('/')
         })
-        console.log('do reset')
     }
 }
 
