@@ -11,6 +11,7 @@ const flash = require('connect-flash')
 const csrf = require('csurf')
 const baseUrl = require('./middlewares/baseUrl')
 const methodOverride = require('method-override')
+const multer = require('multer')
 
 
 const dotenv = require('dotenv')
@@ -45,6 +46,24 @@ app.set('views', 'views')
 // 2. load body-parser
 // fill data from request to req.body
 app.use(bodyParser.urlencoded({ extended: true }))
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads')
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, uniqueSuffix + file.originalname)
+    }
+})
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
+        cb(null, true)
+    } else {
+        cb(null, false)
+    }
+}
+app.use(multer({storage, fileFilter}).single('image'))
 
 // 3. config folder static
 app.use(express.static('public'))
@@ -86,7 +105,11 @@ app.use((req, res, next) => {
 
 // error handler
 app.use(function (err, req, res, next) {
-    if (err.code !== 'EBADCSRFTOKEN') return next(err)
+    console.log(req.body)
+    console.log(err.code)
+    if (err.code !== 'EBADCSRFTOKEN') {
+        return next(err)
+    }
 
     // handle CSRF token errors here
     res.status(403)

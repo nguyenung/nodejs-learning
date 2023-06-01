@@ -32,3 +32,12 @@ form.form-data button[type=submit] {
 form.form-data button[type=submit]:hover {
     background-color: #45a049;
 }
+
+form.form-data .file-input {
+    margin-top: 20px;
+    margin-bottom: 25px;
+}
+
+form.form-data input[type=file] {
+    margin-left: 15px;
+}
