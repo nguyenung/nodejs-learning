@@ -131,3 +131,6 @@ dist
 
 # Data folder
 .data/
+
+#upload folder
+public/uploads

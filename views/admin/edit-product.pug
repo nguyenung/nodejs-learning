@@ -6,7 +6,7 @@ block style
 block content
     h1= (editMode) ? 'Edit product' : 'Add product'
     .form-wrapper
-        form(action=(editMode ? `/admin/edit-product` : '/admin/add-product'), method="POST", class="add-product form-data")
+        form(action=(editMode ? `/admin/edit-product` : '/admin/add-product'), method="POST", class="add-product form-data" enctype="multipart/form-data")
             input(type="hidden", name="_csrf", value=csrfToken)
             label(for='product-title') Product title
             input#product-title(
@@ -17,14 +17,13 @@ block content
                 value=(editMode ? product.title : '')
             )
 
-            label(for='product-imageUrl') Product image URL
-            input#product-imageUrl(
-                type='text' 
-                required 
-                name='imageUrl' 
-                autocomplete='off' 
-                value=(editMode ? product.imageUrl : '')
-            )
+            .file-input
+                label(for='product-image') Product image
+                input#product-image(
+                    type='file' 
+                    required 
+                    name='image' 
+                )
 
             label(for='product-description') Product description
             input#product-description(

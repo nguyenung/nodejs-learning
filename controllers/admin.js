@@ -27,16 +27,18 @@ exports.getAddProduct = (req, res, next) => {
 }
 
 exports.postAddProduct = async (req, res, next) => {
-    const { title, description, imageUrl, price } = req.body
+    const { title, description, price } = req.body
+    const image = req.file
+    console.log(image)
     const userId = req.user
-    const product = new Product({
-        title,
-        description,
-        imageUrl,
-        price,
-        userId
-    })
-    await product.save()
+    // const product = new Product({
+    //     title,
+    //     description,
+    //     imageUrl,
+    //     price,
+    //     userId
+    // })
+    // await product.save()
     res.redirect('/')
 }
 
