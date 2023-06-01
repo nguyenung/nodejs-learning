@@ -12,7 +12,7 @@ exports.getProducts = (req, res, next) => {
                 isLoggedIn: req.session.isLoggedIn,
             })
         })
-        .catch(err => console.log(err))
+        .catch(err => errorHandler(next, err.message))
 }
 
 exports.getProduct = async (req, res, next) => {
@@ -24,7 +24,7 @@ exports.getProduct = async (req, res, next) => {
             isLoggedIn: req.session.isLoggedIn,
         })
     } catch (err) {
-        helpers.errorHandle(err)
+        errorHandler(next, err.message)
     }
 }
 
@@ -38,7 +38,7 @@ exports.getIndexPage = (req, res, next) => {
                 isLoggedIn: req.session.isLoggedIn,
             })
         })
-        .catch(err => console.log(err))
+        .catch(err => errorHandler(next, err.message))
 }
 
 exports.getCartPage = async (req, res, next) => {
@@ -50,8 +50,8 @@ exports.getCartPage = async (req, res, next) => {
             cartData: userWithCart.cart,
             isLoggedIn: req.session.isLoggedIn,
         })
-    } catch (error) {
-        helpers.errorHandle(error)
+    } catch (err) {
+        errorHandler(next, err.message)
     }
 }
 
@@ -60,8 +60,8 @@ exports.addToCart = async (req, res, next) => {
         const product = await Product.findById(req.body.productId)
         await req.user.addToCart(product)
         res.redirect('/cart')
-    } catch (error) {
-        helpers.errorHandle(error)
+    } catch (err) {
+        errorHandler(next, err.message)
     }
 }
 
@@ -74,7 +74,7 @@ exports.deleteCartItem = async (req, res, next) => {
         }
         res.redirect('/cart')
     } catch (err) {
-        helpers.errorHandle(err)
+        errorHandler(next, err.message)
     }
 }
 

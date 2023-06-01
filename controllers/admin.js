@@ -14,7 +14,7 @@ exports.getProducts = (req, res, next) => {
         })
     })
     .catch(err => {
-        helpers.errorHandle(err)
+        errorHandler(next, err.message)
     })
 }
 
@@ -58,7 +58,7 @@ exports.getEditProduct = async (req, res, next) => {
             isLoggedIn: req.session.isLoggedIn,
         })
     } catch(err) {
-        helpers.errorHandle(err)
+        errorHandler(next, err.message)
     }
 }
 
@@ -75,7 +75,7 @@ exports.doEditProduct = async (req, res, next) => {
         const updatedProduct = await Product.findByIdAndUpdate(productId, updatedFields)
         res.redirect('/admin/products')
     } catch(err) {
-        console.error('Error updating record:', err)
+        errorHandler(next, err.message)
     }
 }
 
@@ -84,7 +84,7 @@ exports.doDeleteProduct = async (req, res, next) => {
     try {
         await Product.findByIdAndRemove(productId)
         res.redirect('/admin/products')
-    } catch (error) {
-        helpers.errorHandle(error)
+    } catch (err) {
+        errorHandler(next, err.message)
     }
 }

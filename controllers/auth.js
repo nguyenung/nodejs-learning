@@ -3,6 +3,7 @@ const sendEmail = require('./../utils/email-sender')
 const User = require('./../models/user')
 const PasswordReset = require('./../models/password-reset')
 const crypto = require('crypto')
+const errorHandler = require('./../utils/error-handler');
 
 exports.signupPage = (req, res, next) => {
     const errorMessage = req.flash('error')
@@ -42,7 +43,7 @@ exports.signup = async (req, res, next) => {
             () => {res.redirect('/')}
         )
     } catch (error) {
-        console.error(error)
+        errorHandler(next, error.message)
     }
 }
 
@@ -77,7 +78,7 @@ exports.login = async (req, res, next) => {
             }
         })
     } catch (error) {
-        console.error(error)
+        errorHandler(next, error.message)
     }
 }
 
@@ -112,7 +113,7 @@ exports.newPasswordPage = async (req, res, next) => {
             }
         }
     } catch (error) {
-        console.error(error)
+        errorHandler(next, error.message)
     }
 }
 
@@ -120,15 +121,11 @@ exports.createNewPassword = async (req, res, next) => {
     const {id, token, password} = req.body
     const passwordReset = await PasswordReset.findOne({_id: id, token})
     if (!passwordReset) {
-        const error = new Error('Invalid token or Password reset link has expired.')
-        error.statusCode = 403
-        next(error)
+        errorHandler(next, 'Invalid token or Password reset link has expired.', 403)
     } else {
         const now = Date.now()
         if (passwordReset.expiresAt < now) {
-            const error = new Error('Invalid token or Password reset link has expired.')
-            error.statusCode = 403
-            next(error)
+            errorHandler(next, 'Invalid token or Password reset link has expired.', 403)
         } else {
             const user = await User.findOne({email: passwordReset.email})
             const saltRounds = 10
@@ -147,13 +144,11 @@ exports.resetPassword = async (req, res, next) => {
     const { email } = req.body
     const user = await User.findOne({ email: email})
     if (!user) {
-        req.flash('error', 'No account with that email address exists.')
-        return res.redirect('/forgot-password')
+        errorHandler(next, 'No account with that email address exists.', 403)
     } else {
         crypto.randomBytes(32, async (err, buf) => {
             if (err) {
-                console.error(err)
-                return res.redirect('/forgot-password')
+                errorHandler(next, err.message)
             }
             const token = buf.toString('hex')
             
@@ -181,6 +176,6 @@ exports.logout = (req, res, next) => {
             res.redirect('/')
         })
     } else {
-        throw new Error('You must log in first.')
+        errorHandler(next, 'You must log in first.', 403)
     }
 }
