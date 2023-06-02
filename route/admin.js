@@ -13,6 +13,6 @@ router.get('/edit-product/:productId', requireAuth, adminController.getEditProdu
 
 router.post('/edit-product', requireAuth, adminController.doEditProduct)
 
-router.post('/delete-product', requireAuth, adminController.doDeleteProduct)
+router.delete('/product/:productId', requireAuth, adminController.deleteProduct)
 
 exports.router = router

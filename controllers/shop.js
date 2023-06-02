@@ -2,7 +2,6 @@ const Product = require('./../models/product')
 const getPaginatedResults = require('../utils/paginator')
 
 exports.getIndexPage = async (req, res, next) => {
-    console.log(`${res.locals.baseUrl}/${req.originalUrl === '/' ? '' : req.originalUrl.replace(/^\//, '')}`)
     const paginationData = await getPaginatedResults(req, res, Product)
     res.render('shop/index', {
         path: '/',

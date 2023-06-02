@@ -1,4 +1,4 @@
-const getPaginatedResults = async (req, res, model, conditions = {}, limit=2) => {
+const getPaginatedResults = async (req, res, model, conditions = {}, limit=10) => {
     let currentPage
     if (!req.query.page) {
         currentPage = 1
