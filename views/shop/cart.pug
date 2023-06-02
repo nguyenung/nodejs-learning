@@ -10,7 +10,7 @@ block content
             .grid
                 each cartItem in cartData.items
                     .card
-                        img(src=`${cartItem.productId.imageUrl}` alt="Image" style='width:100%')
+                        img(src=`/${cartItem.productId.imageUrl}` alt="Image" style='width:100%')
                         h6.product-title #{cartItem.productId.title}($#{cartItem.productId.price})
                         p.price Quantity: #{cartItem.quantity}
                         p

@@ -17,6 +17,8 @@ block content
                 value=(editMode ? product.title : '')
             )
 
+            if (editMode)
+                img(src=`/${product.imageUrl}`, alt="", srcset="")
             .file-input
                 label(for='product-image') Product image
                 input#product-image(
