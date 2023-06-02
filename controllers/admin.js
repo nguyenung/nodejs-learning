@@ -115,10 +115,13 @@ exports.doEditProduct = async (req, res, next) => {
     }
 }
 
-exports.doDeleteProduct = async (req, res, next) => {
-    const productId = req.body.productId
+exports.deleteProduct = async (req, res, next) => {
+    const productId = req.params.productId
     try {
         const product = await Product.findById(productId)
+        if (!product) {
+            throw new Error('Product not found.')
+        }
         const currentImagePath = path.join('public', product.imageUrl)
         await Product.findByIdAndRemove(productId)
         fs.unlink(currentImagePath, (err) => {
@@ -128,8 +131,9 @@ exports.doDeleteProduct = async (req, res, next) => {
                 console.log('File deleted successfully.')
             }
         })
-        res.redirect('/admin/products')
+        res.status(200).json({message: 'File deleted successfully'})
     } catch (err) {
-        errorHandler(next, err.message)
+        console.log(err)
+        res.status(500).json({message: 'File deleted failed'})
     }
 }
