@@ -6,9 +6,9 @@ block style
 block content
     h1 All product
     .product-list
-        if products && products.length
+        if paginationData.items && paginationData.items.length
             .grid
-                each product in products
+                each product in paginationData.items
                     .card
                         img(src=`/${product.imageUrl}` alt="Image" style='width:100%')
                         h1 #{product.title}
@@ -19,6 +19,7 @@ block content
                             form(action="/admin/delete-product" method="POST" class="form-data")
                                 input(type="hidden", name="_csrf", value=csrfToken)
                                 input(type="hidden", name="productId" value=product._id)
-                                button(type="submit" class="button-red") Delete 
+                                button(type="submit" class="button-red") Delete
+            include ../partials/pagination
         else
             h2 No product found.

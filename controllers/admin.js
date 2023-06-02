@@ -2,28 +2,23 @@ const Product = require('./../models/product')
 const errorHandler = require('./../utils/error-handler')
 const fs = require('fs')
 const path = require('path')
+const getPaginatedResults = require('../utils/paginator')
 
-exports.getProducts = (req, res, next) => {
-    Product.find({ userId: req.user.id })
-        // .select('title price -_id')
-        // .populate('userId')
-        .then(products => {
-            res.render('admin/products', {
-                path: "/admin/products",
-                products: products,
-                pageTitle: "Admin - All product",
-                isLoggedIn: req.session.isLoggedIn,
-            })
-        })
-        .catch(err => {
-            errorHandler(next, err.message)
-        })
+exports.getProducts = async (req, res, next) => {
+    const paginationData = await getPaginatedResults(req, res, Product, { userId: req.user.id })
+
+    res.render('admin/products', {
+        path: '/admin/products',
+        pageTitle: 'Admin - All product',
+        isLoggedIn: req.session.isLoggedIn,
+        paginationData
+    })
 }
 
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
-        path: "/admin/add-product",
-        pageTitle: "Add product",
+        path: '/admin/add-product',
+        pageTitle: 'Add product',
         isLoggedIn: req.session.isLoggedIn,
     })
 }

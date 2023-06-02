@@ -46,3 +46,20 @@ nav ul li a.active {
 .mt-20 {
     margin-top: 20px;
 }
+
+.pagination {
+    text-align: center;
+}
+
+.pagination a.page-link {
+    border: 1px solid rgb(216, 214, 214);
+    margin-right: 5px;
+    padding: 5px 0;
+    text-align: center;
+    width: 25px;
+    display: inline-block;
+}
+
+.pagination a.page-link.active {
+    background-color: rgb(207, 229, 232);
+}
