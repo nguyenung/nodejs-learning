@@ -1,18 +1,25 @@
 const Product = require('./../models/product')
+const getPaginatedResults = require('../utils/paginator')
 
-const helpers = require('./../utils/helpers')
+exports.getIndexPage = async (req, res, next) => {
+    console.log(`${res.locals.baseUrl}/${req.originalUrl === '/' ? '' : req.originalUrl.replace(/^\//, '')}`)
+    const paginationData = await getPaginatedResults(req, res, Product)
+    res.render('shop/index', {
+        path: '/',
+        pageTitle: 'Shop',
+        isLoggedIn: req.session.isLoggedIn,
+        paginationData,
+    })
+}
 
-exports.getProducts = (req, res, next) => {
-    Product.find()
-        .then(products => {
-            res.render('shop/product-list', {
-                path: '/products',
-                products: products,
-                pageTitle: 'All product',
-                isLoggedIn: req.session.isLoggedIn,
-            })
-        })
-        .catch(err => errorHandler(next, err.message))
+exports.getProducts = async (req, res, next) => {
+    const paginationData = await getPaginatedResults(req, res, Product)
+    res.render('shop/product-list', {
+        path: '/products',
+        pageTitle: 'All product',
+        isLoggedIn: req.session.isLoggedIn,
+        paginationData
+    })
 }
 
 exports.getProduct = async (req, res, next) => {
@@ -26,19 +33,6 @@ exports.getProduct = async (req, res, next) => {
     } catch (err) {
         errorHandler(next, err.message)
     }
-}
-
-exports.getIndexPage = (req, res, next) => {
-    Product.find()
-        .then(products => {
-            res.render('shop/index', {
-                path: '/',
-                products: products,
-                pageTitle: 'Shop',
-                isLoggedIn: req.session.isLoggedIn,
-            })
-        })
-        .catch(err => errorHandler(next, err.message))
 }
 
 exports.getCartPage = async (req, res, next) => {

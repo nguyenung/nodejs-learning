@@ -1,0 +1,11 @@
+.pagination
+    if paginationData.totalPage > 0
+        if (paginationData.hasPrevPage)
+            a(href=`${paginationData.url}` title='First page'  class='page-link') &laquo;
+            a(href=`${paginationData.url}?page=${paginationData.prevPage}` title='Prev page' class='page-link') &lsaquo;
+        - n = 1
+        while n <= paginationData.totalPage
+            a(href=`${paginationData.url}?page=${n}` title=`Page ${n}` class=`page-link ${n==paginationData.currentPage ? 'active' : ''}`)=n++
+        if (paginationData.hasNextPage)
+            a(href=`${paginationData.url}?page=${paginationData.nextPage}` title='Next page' class='page-link') &rsaquo;
+            a(href=`${paginationData.url}?page=${paginationData.totalPage}` title='Last page' class='page-link') &raquo;

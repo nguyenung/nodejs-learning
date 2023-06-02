@@ -6,10 +6,11 @@ block style
 block content
     h1 All product
     .product-list
-        if products && products.length
+        if paginationData.items && paginationData.items.length
             .grid
-                each product in products
+                each product in paginationData.items
                     include _product-card
+            include ../partials/pagination
 
         else
             h2 No product found.
