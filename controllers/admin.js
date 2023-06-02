@@ -1,21 +1,23 @@
 const Product = require('./../models/product')
-const helpers = require('./../utils/helpers')
+const errorHandler = require('./../utils/error-handler')
+const fs = require('fs')
+const path = require('path')
 
 exports.getProducts = (req, res, next) => {
-    Product.find({userId: req.user.id})
-    // .select('title price -_id')
-    // .populate('userId')
-    .then(products => {
-        res.render('admin/products', {
-            path: "/admin/products",
-            products: products,
-            pageTitle: "Admin - All product",
-            isLoggedIn: req.session.isLoggedIn,
+    Product.find({ userId: req.user.id })
+        // .select('title price -_id')
+        // .populate('userId')
+        .then(products => {
+            res.render('admin/products', {
+                path: "/admin/products",
+                products: products,
+                pageTitle: "Admin - All product",
+                isLoggedIn: req.session.isLoggedIn,
+            })
         })
-    })
-    .catch(err => {
-        errorHandler(next, err.message)
-    })
+        .catch(err => {
+            errorHandler(next, err.message)
+        })
 }
 
 exports.getAddProduct = (req, res, next) => {
@@ -28,17 +30,27 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = async (req, res, next) => {
     const { title, description, price } = req.body
-    const image = req.file
-    console.log(image)
     const userId = req.user
-    // const product = new Product({
-    //     title,
-    //     description,
-    //     imageUrl,
-    //     price,
-    //     userId
-    // })
-    // await product.save()
+    const initData = {
+        title,
+        description,
+        price,
+        userId
+    }
+    const image = req.file
+    if (image) {
+        const imageName = path.basename(image.path)
+        fs.rename(image.path, `public/uploads/${imageName}`, (err) => {
+            if (err) {
+                console.error('Error moving file:', err)
+            } else {
+                console.log('File moved successfully')
+            }
+        })
+        initData.imageUrl = image.path.replace(/^.tmp/, 'uploads')
+    }
+    const product = new Product(initData)
+    await product.save()
     res.redirect('/')
 }
 
@@ -59,7 +71,7 @@ exports.getEditProduct = async (req, res, next) => {
             product: product,
             isLoggedIn: req.session.isLoggedIn,
         })
-    } catch(err) {
+    } catch (err) {
         errorHandler(next, err.message)
     }
 }
@@ -67,16 +79,43 @@ exports.getEditProduct = async (req, res, next) => {
 exports.doEditProduct = async (req, res, next) => {
     const productId = req.body.productId
     try {
-        const {title, description, imageUrl, price} = req.body
+        const { title, description, price } = req.body
         const updatedFields = {
             title,
-            imageUrl,
             description,
             price
         }
-        const updatedProduct = await Product.findByIdAndUpdate(productId, updatedFields)
+        const image = req.file
+        const product = await Product.findById(productId)
+        let currentImagePath = product.imageUrl
+        let needDeleteCurrentImage = false
+        if (image) {
+            currentImagePath = path.join('public', currentImagePath)
+
+            const imageName = path.basename(image.path)
+            fs.rename(image.path, `public/uploads/${imageName}`, (err) => {
+                if (err) {
+                    console.error('Error moving file:', err)
+                } else {
+                    console.log('File moved successfully')
+                }
+            })
+
+            updatedFields.imageUrl = image.path.replace(/^.tmp/, 'uploads')
+            needDeleteCurrentImage = true
+        }
+
+        await Product.findByIdAndUpdate(productId, updatedFields)
+        needDeleteCurrentImage && fs.unlink(currentImagePath, (err) => {
+            if (err) {
+                console.error('Error deleting file:', err)
+            } else {
+                console.log('File deleted successfully.')
+            }
+        })
         res.redirect('/admin/products')
-    } catch(err) {
+    } catch (err) {
+        console.log(err)
         errorHandler(next, err.message)
     }
 }
@@ -84,7 +123,16 @@ exports.doEditProduct = async (req, res, next) => {
 exports.doDeleteProduct = async (req, res, next) => {
     const productId = req.body.productId
     try {
+        const product = await Product.findById(productId)
+        const currentImagePath = path.join('public', product.imageUrl)
         await Product.findByIdAndRemove(productId)
+        fs.unlink(currentImagePath, (err) => {
+            if (err) {
+                console.error('Error deleting file:', err)
+            } else {
+                console.log('File deleted successfully.')
+            }
+        })
         res.redirect('/admin/products')
     } catch (err) {
         errorHandler(next, err.message)

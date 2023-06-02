@@ -10,13 +10,14 @@ block content
             .grid
                 each product in products
                     .card
-                        img(src=product.imageUrl alt="Image" style='width:100%')
+                        img(src=`/${product.imageUrl}` alt="Image" style='width:100%')
                         h1 #{product.title}
                         p.price $#{product.price}
                         p #{product.description}
                         p
                             a(href=`/admin/edit-product/${product._id}` class="button button-green") Edit
                             form(action="/admin/delete-product" method="POST" class="form-data")
+                                input(type="hidden", name="_csrf", value=csrfToken)
                                 input(type="hidden", name="productId" value=product._id)
                                 button(type="submit" class="button-red") Delete 
         else
