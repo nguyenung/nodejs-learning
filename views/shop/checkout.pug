@@ -1,4 +1,30 @@
 extends ../layout/main.pug
 
+block style 
+    link(rel="stylesheet", href="/css/product.css")
+
+block javascript
+    script(src="https://js.stripe.com/v3/") 
+
 block content
-    h1 Checkout page
+    h1 Checkout
+    if (cartData.items && cartData.items.length > 0)
+        .product-list
+            .grid
+                each cartItem in cartData.items
+                    .card
+                        img(src=`/${cartItem.productId.imageUrl}` alt="Image" style='width:100%')
+                        h6.product-title #{cartItem.productId.title}($#{cartItem.productId.price})
+                        p.price Quantity: #{cartItem.quantity}
+                        p
+                            form(action="/delete-cart-item" method="POST")
+                                input(type="hidden", name="_csrf", value=csrfToken)
+                                input(type="hidden", name="productId" value=cartItem.productId._id)
+                                button(type="submit" class="button-red") Remove
+        .order-form
+            h5 Total amount: $#{cartData.totalPrice}
+            form(action="/create-checkout-session", method="post") 
+                input(type="hidden", name="_csrf", value=csrfToken)
+                button(type="submit" class="button button-blue") Checkout
+    else
+        p Nothing here

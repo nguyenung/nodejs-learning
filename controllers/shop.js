@@ -1,5 +1,9 @@
 const Product = require('./../models/product')
 const getPaginatedResults = require('../utils/paginator')
+const { loadEnvironmentVariables } = require('./../config/env');
+loadEnvironmentVariables()
+
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 exports.getIndexPage = async (req, res, next) => {
     const paginationData = await getPaginatedResults(req, res, Product)
@@ -90,10 +94,49 @@ exports.getOrdersPage = async (req, res, next) => {
     })
 }
 
-exports.getCheckoutPage = (req, res, next) => {
-    res.render('shop/checkout', {
-        path: '/checkout',
-        pageTitle: 'Checkout',
+exports.getCheckoutPage = async (req, res, next) => {
+    try {
+        const userWithCart = await req.user.populate('cart.items.productId')
+        res.render('shop/checkout', {
+            path: '/checkout',
+            pageTitle: 'Cart',
+            cartData: userWithCart.cart,
+            isLoggedIn: req.session.isLoggedIn,
+        })
+    } catch (err) {
+        errorHandler(next, err.message)
+    }
+}
+
+exports.getCheckoutSuccessPage = async (req, res, next) => {
+    res.render('shop/checkout-success', {
+        path: '/checkout-success',
+        pageTitle: 'Success',
+        isLoggedIn: req.session.isLoggedIn,
+        supportEmail: process.env.SUPPORT_EMAIL
+    })
+}
+
+exports.getCheckoutCancelPage = async (req, res, next) => {
+    res.render('shop/checkout-cancel', {
+        path: '/checkout-cancel',
+        pageTitle: 'Cancel checkout',
         isLoggedIn: req.session.isLoggedIn,
     })
+}
+
+exports.createCheckoutSession = async (req, res, next) => {
+    const session = await stripe.checkout.sessions.create({
+        line_items: [
+            {
+                // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                price: 'price_1NEkSFD0uJpi15ej1pE5AzqY',
+                quantity: 1,
+            },
+        ],
+        mode: 'payment',
+        success_url: `${res.locals.baseUrl}/checkout-success`,
+        cancel_url: `${res.locals.baseUrl}/checkout-cancel`,
+    });
+    res.redirect(303, session.url);
 }

@@ -19,6 +19,12 @@ router.get('/orders', requireAuth, shopController.getOrdersPage)
 
 router.post('/create-order', requireAuth, shopController.createOrder)
 
-// router.get('/checkout', shopController.getCheckoutPage)
+router.post('/create-checkout-session', requireAuth, shopController.createCheckoutSession)
+
+router.get('/checkout', shopController.getCheckoutPage)
+
+router.get('/checkout-success', shopController.getCheckoutSuccessPage)
+
+router.get('/checkout-cancel', shopController.getCheckoutCancelPage)
 
 exports.router = router

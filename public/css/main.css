@@ -1,17 +1,22 @@
 a {
     text-decoration: none;
 }
-main, nav {
+
+main,
+nav {
     max-width: 1000px;
     margin: 0 auto;
 }
+
 nav {
-    background-color:rgb(227, 241, 102);
+    background-color: rgb(227, 241, 102);
     padding: 1px 15px;
 }
+
 ul {
     padding: 0;
 }
+
 li {
     list-style: none;
     display: inline;
@@ -62,4 +67,14 @@ nav ul li a.active {
 
 .pagination a.page-link.active {
     background-color: rgb(207, 229, 232);
+}
+
+section {
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 112px;
+    border-radius: 6px;
+    justify-content: space-between;
 }

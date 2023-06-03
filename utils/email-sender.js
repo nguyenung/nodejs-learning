@@ -1,11 +1,8 @@
 const nodemailer = require('nodemailer')
 const pug = require('pug')
 const path = require('path')
-
-const dotenv = require('dotenv')
-dotenv.config()
-const environment = process.env.NODE_ENV || 'local'
-dotenv.config({ path: `.env.${environment}` })
+const { loadEnvironmentVariables } = require('./../config/env');
+loadEnvironmentVariables()
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.sendgrid.net',

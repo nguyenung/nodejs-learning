@@ -20,8 +20,6 @@ block content
                                 button(type="submit" class="button-red") Remove
         .order-form
             h5 Total amount: $#{cartData.totalPrice}
-            form(action="/create-order", method="post" class="form-data")
-                input(type="hidden", name="_csrf", value=csrfToken)
-                button(type="submit" class="button button-blue") Order now!
+            a(href="/checkout" class="button button-blue") Order now!
     else
         p Nothing here
