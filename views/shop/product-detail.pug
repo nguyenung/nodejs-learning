@@ -6,7 +6,7 @@ block style
 block content
     if(product)
         .product-detail
-            img(src=product.imageUrl, alt=product.title)
+            img(src=`/${product.imageUrl}`, alt=product.title)
             h2 #{product.title}
             h3.price $#{product.price}
             p #{product.description}

@@ -1,12 +1,7 @@
 const mongodb = require('mongodb')
 const MongoClient = mongodb.MongoClient
-
-const dotenv = require('dotenv');
-
-dotenv.config()
-const environment = process.env.NODE_ENV || 'local'
-
-dotenv.config({ path: `.env.${environment}` })
+const { loadEnvironmentVariables } = require('./../config/env');
+loadEnvironmentVariables()
 
 let _db
 

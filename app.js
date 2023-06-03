@@ -14,10 +14,8 @@ const methodOverride = require('method-override')
 const multer = require('multer')
 
 
-const dotenv = require('dotenv')
-dotenv.config()
-const environment = process.env.NODE_ENV || 'local'
-dotenv.config({ path: `.env.${environment}` })
+const { loadEnvironmentVariables } = require('./config/env');
+loadEnvironmentVariables()
 
 //Live reload when save file
 const livereload = require('livereload')
