@@ -1,30 +1,38 @@
 const express = require('express')
 const router = express.Router()
-const requireAuth = require('../middlewares/require-auth')
+const requireAuth = require('../middleware/require-auth')
 const shopController = require('./../controllers/shop')
+const chatController = require('./../controllers/chat')
 
-router.get('/', shopController.getIndexPage)
 
-router.get('/products', shopController.getProducts)
+module.exports = (io) => {
+    router.get('/', shopController.getIndexPage)
 
-router.get('/products/:productId', shopController.getProduct)
+    router.get('/products', shopController.getProducts)
 
-router.get('/cart', requireAuth, shopController.getCartPage)
+    router.get('/products/:productId', shopController.getProduct)
 
-router.post('/cart', requireAuth, shopController.addToCart)
+    router.get('/cart', requireAuth, shopController.getCartPage)
 
-router.post('/delete-cart-item', requireAuth, shopController.deleteCartItem)
+    router.post('/cart', requireAuth, shopController.addToCart)
 
-router.get('/orders', requireAuth, shopController.getOrdersPage)
+    router.post('/delete-cart-item', requireAuth, shopController.deleteCartItem)
 
-router.post('/create-order', requireAuth, shopController.createOrder)
+    router.get('/orders', requireAuth, shopController.getOrdersPage)
 
-router.post('/create-checkout-session', requireAuth, shopController.createCheckoutSession)
+    router.post('/create-order', requireAuth, shopController.createOrder)
 
-router.get('/checkout', shopController.getCheckoutPage)
+    router.post('/create-checkout-session', requireAuth, shopController.createCheckoutSession)
 
-router.get('/checkout-success', shopController.getCheckoutSuccessPage)
+    router.get('/checkout', shopController.getCheckoutPage)
 
-router.get('/checkout-cancel', shopController.getCheckoutCancelPage)
+    router.get('/checkout-success', shopController.getCheckoutSuccessPage)
 
-exports.router = router
+    router.get('/checkout-cancel', shopController.getCheckoutCancelPage)
+
+    router.get('/chat', requireAuth, chatController.getChatPage)
+
+    router.get('/chat-reply', chatController.doReply.bind(null, io))
+
+    return router
+}

@@ -1,6 +1,6 @@
 const bodyParser = require('body-parser')
 const express = require('express')
-// require('express-async-errors')
+const http = require('http')
 const errorController = require('./controllers/error')
 const mongoose = require('mongoose')
 const helpers = require('./utils/helpers')
@@ -9,10 +9,10 @@ const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
 const flash = require('connect-flash')
 const csrf = require('csurf')
-const baseUrl = require('./middlewares/baseUrl')
+const baseUrl = require('./middleware/baseUrl')
 const methodOverride = require('method-override')
 const multer = require('multer')
-
+const socketIO = require('socket.io')
 
 const { loadEnvironmentVariables } = require('./config/env');
 loadEnvironmentVariables()
@@ -28,6 +28,8 @@ liveReloadServer.server.once("connection", () => {
 })
 
 const app = express()
+const httpServer = http.createServer(app)
+const io = socketIO(httpServer)
 
 app.use(connectLiveReload())
 
@@ -61,7 +63,7 @@ const fileFilter = (req, file, cb) => {
         cb(null, false)
     }
 }
-app.use(multer({storage, fileFilter}).single('image'))
+app.use(multer({ storage, fileFilter }).single('image'))
 
 // 3. config folder static
 app.use(express.static('public'))
@@ -134,12 +136,12 @@ app.use(async (req, res, next) => {
 // 4. load route
 //app.use(an instance of express.Router())
 
-const shopRouters = require('./route/shop')
+const shopRouters = require('./route/shop')(io)
 const adminRouters = require('./route/admin')
 const authRouters = require('./route/auth')
 
 app.use('/admin', adminRouters.router)
-app.use(shopRouters.router)
+app.use(shopRouters)
 app.use(authRouters.router)
 
 app.use(methodOverride())
@@ -151,11 +153,26 @@ app.use((err, req, res, next) => {
 // 5. set 404 page
 app.use(errorController.pageNotFound)
 
-mongoose.connect(process.env.DB_MONGODB_CREDENTIAL)
-    .then(result => {
-        console.log('Connected to MongoDB though mongoose')
-        app.listen(3000)
+async function connectToMongoDB() {
+    try {
+        await mongoose.connect(process.env.DB_MONGODB_CREDENTIAL);
+        console.log('Connected to MongoDB through mongoose');
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+connectToMongoDB();
+
+io.on('connection', socket => {
+    console.log('Client connection established')
+    socket.on('chat message', (msg) => {
+        console.log('message: ' + msg)
+        socket.emit('chat message', 'Chat back')
     })
-    .catch(err => {
-        console.log(err)
+    socket.on('disconnect', () => {
+        console.log('Disconnected')
     })
+})
+
+httpServer.listen(3000)
