@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const adminController = require('./../controllers/admin')
-const requireAuth = require('../middlewares/require-auth')
+const requireAuth = require('../middleware/require-auth')
 
 router.get('/products', requireAuth, adminController.getProducts)
 

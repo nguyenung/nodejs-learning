@@ -1,6 +1,6 @@
 const Product = require('./../models/product')
 const getPaginatedResults = require('../utils/paginator')
-const { loadEnvironmentVariables } = require('./../config/env');
+const { loadEnvironmentVariables } = require('./../config/env')
 loadEnvironmentVariables()
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
