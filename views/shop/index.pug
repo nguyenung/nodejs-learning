@@ -3,11 +3,22 @@ extends ../layout/main.pug
 block style 
     link(rel="stylesheet", href="/css/product.css")
 
+block javascript
+    script(src="https://cdn.socket.io/4.5.4/socket.io.min.js")
+    script.
+        var socket = io()
+        socket.on('products', function (message) {
+            if (message.action == 'create') {
+                const productCardHtml = message.productCardHtml
+                document.querySelector('#product-grid').insertAdjacentHTML('beforeend', productCardHtml)
+            }
+        })
+
 block content
     h1 Shop
     .product-list
         if paginationData.items && paginationData.items.length
-            .grid
+            #product-grid.grid
                 each product in paginationData.items
                     include _product-card
             include ../partials/pagination
