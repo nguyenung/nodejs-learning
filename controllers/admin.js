@@ -3,10 +3,13 @@ const errorHandler = require('./../utils/error-handler')
 const fs = require('fs')
 const path = require('path')
 const getPaginatedResults = require('../utils/paginator')
+const io = require('./../socket')
+const pug = require('pug')
+
+const rootDir = path.join(__dirname, '../')
 
 exports.getProducts = async (req, res, next) => {
     const paginationData = await getPaginatedResults(req, res, Product, { userId: req.user.id })
-
     res.render('admin/products', {
         path: '/admin/products',
         pageTitle: 'Admin - All product',
@@ -46,6 +49,14 @@ exports.postAddProduct = async (req, res, next) => {
     }
     const product = new Product(initData)
     await product.save()
+
+    const productCardHtml = pug.renderFile(path.join(rootDir, 'views', 'shop', '_product-card.pug'), { product })
+
+    await io.getIO().emit('products', {
+        action: 'create',
+        productCardHtml
+    })
+
     res.redirect('/')
 }
 

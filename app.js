@@ -1,6 +1,5 @@
 const bodyParser = require('body-parser')
 const express = require('express')
-const http = require('http')
 const errorController = require('./controllers/error')
 const mongoose = require('mongoose')
 const helpers = require('./utils/helpers')
@@ -12,7 +11,6 @@ const csrf = require('csurf')
 const baseUrl = require('./middleware/baseUrl')
 const methodOverride = require('method-override')
 const multer = require('multer')
-const socketIO = require('socket.io')
 
 const { loadEnvironmentVariables } = require('./config/env');
 loadEnvironmentVariables()
@@ -28,8 +26,6 @@ liveReloadServer.server.once("connection", () => {
 })
 
 const app = express()
-const httpServer = http.createServer(app)
-const io = socketIO(httpServer)
 
 app.use(connectLiveReload())
 
@@ -136,12 +132,12 @@ app.use(async (req, res, next) => {
 // 4. load route
 //app.use(an instance of express.Router())
 
-const shopRouters = require('./route/shop')(io)
+const shopRouters = require('./route/shop')
 const adminRouters = require('./route/admin')
 const authRouters = require('./route/auth')
 
 app.use('/admin', adminRouters.router)
-app.use(shopRouters)
+app.use(shopRouters.router)
 app.use(authRouters.router)
 
 app.use(methodOverride())
@@ -162,8 +158,11 @@ async function connectToMongoDB() {
     }
 }
 
-connectToMongoDB();
+connectToMongoDB()
 
+const httpServer = app.listen(3000)
+
+const io = require('./socket').init(httpServer)
 io.on('connection', socket => {
     console.log('Client connection established')
     socket.on('chat message', (msg) => {
@@ -174,5 +173,3 @@ io.on('connection', socket => {
         console.log('Disconnected')
     })
 })
-
-httpServer.listen(3000)
