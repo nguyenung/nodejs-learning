@@ -1,5 +1,9 @@
 const bodyParser = require('body-parser')
+const fs = require('fs')
+const path = require('path')
 const express = require('express')
+const helmet = require('helmet')
+const compression = require('compression')
 const errorController = require('./controllers/error')
 const mongoose = require('mongoose')
 const helpers = require('./utils/helpers')
@@ -11,6 +15,8 @@ const csrf = require('csurf')
 const baseUrl = require('./middleware/baseUrl')
 const methodOverride = require('method-override')
 const multer = require('multer')
+const morgan = require('morgan')
+const https = require('https')
 
 const { loadEnvironmentVariables } = require('./config/env');
 loadEnvironmentVariables()
@@ -26,6 +32,18 @@ liveReloadServer.server.once("connection", () => {
 })
 
 const app = express()
+
+app.use(helmet({
+    contentSecurityPolicy: false,
+}))
+
+app.use(compression())
+
+const streamLog = fs.createWriteStream(
+    path.join(__dirname, 'logs/access.log'),
+    { flags: 'a' }
+)
+app.use(morgan('combined', { stream: streamLog }))
 
 app.use(connectLiveReload())
 
@@ -99,6 +117,9 @@ app.use((req, res, next) => {
     next()
 })
 
+const privateKey = fs.readFileSync('server.key')
+const certificate = fs.readFileSync('server.cert')
+
 // error handler
 app.use(function (err, req, res, next) {
     console.log(req.body)
@@ -160,7 +181,11 @@ async function connectToMongoDB() {
 
 connectToMongoDB()
 
-const httpServer = app.listen(3000)
+const httpServer = https.createServer({
+    key: privateKey,
+    cert: certificate
+}, app)
+    .listen(3000)
 
 const io = require('./socket').init(httpServer)
 io.on('connection', socket => {
