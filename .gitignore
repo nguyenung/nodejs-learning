@@ -130,9 +130,12 @@ dist
 .pnp.*
 
 # Data folder
-.data/
+.data/*
+!.data/.gitkeep
 
 #upload folder
-public/uploads
+public/uploads/*
+!public/uploads/.gitkeep
 
-.tmp/
+.tmp/*
+!.tmp/.gitkeep
