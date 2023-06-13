@@ -15,7 +15,6 @@ const csrf = require('csurf')
 const baseUrl = require('./middleware/baseUrl')
 const methodOverride = require('method-override')
 const multer = require('multer')
-const morgan = require('morgan')
 const https = require('https')
 
 const { loadEnvironmentVariables } = require('./config/env');
@@ -38,12 +37,6 @@ app.use(helmet({
 }))
 
 app.use(compression())
-
-const streamLog = fs.createWriteStream(
-    path.join(__dirname, 'logs/access.log'),
-    { flags: 'a' }
-)
-app.use(morgan('combined', { stream: streamLog }))
 
 app.use(connectLiveReload())
 
